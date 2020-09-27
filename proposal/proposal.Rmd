@@ -1,0 +1,27 @@
+---
+output:
+  pdf_document:
+    # citation_package: biblatex
+    keep_tex: true
+    fig_caption: true
+    latex_engine: pdflatex
+    template: ../svm-latex-ms.tex
+title: "Political Donor Polarization: Observing Consumptive Behavior using a Network Approach"
+thanks: "Code and data available at: github.com/rossdahlke"
+author:
+- name: Ross Dahlke
+affiliation: Stanford University
+abstract: ""
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+geometry: margin=1in
+fontfamily: mathpazo
+fontsize: 12pt
+spacing: double
+bibliography: ../bibliography.bib
+biblio-style: apsr
+---
+
+
+
+
+# References
