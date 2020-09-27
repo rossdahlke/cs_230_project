@@ -6,10 +6,10 @@ output:
     fig_caption: true
     latex_engine: pdflatex
     template: ../svm-latex-ms.tex
-title: "Identifying Opinion Change and Knowledge Levels of Deliberative Groups"
+title: "Identifying Opinion Change and Knowledge Levels of Deliberative Groups (Natural Language Processing)"
 thanks: "Code and data available at: github.com/rossdahlke/cs_230_project"
 author:
-- name: Ross Dahlke
+- name: Ross Dahlke (rdahlke@stanford.edu)
 affiliation: Stanford University
 abstract: ""
 date: "`r format(Sys.time(), '%B %d, %Y')`"
@@ -34,6 +34,8 @@ After meeting with Dr. Alice Siu, Associate Directory of the Center for Delibera
 In each of these datasets there should be transcripts from about 20 groups and the survey responses of the members of each of those groups. In total, I anticipate having about 60 total examples of transcripts and summarized survey results. Of these 60 examples, I plan to use 51 as a training set, 6 as a test set, and 3 as a validation set. 
 
 # 3. Challenges
+
+The biggest challenge will be training challenges of this project will be dealing with the relatively small number of training examples. If we are able to use pre-trained transformers, for our final project, I anticipate that this number training examples will be adequate given the rise of one- or few-shot learning.
 
 # 4. Methods
 
