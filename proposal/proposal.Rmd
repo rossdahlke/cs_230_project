@@ -6,8 +6,8 @@ output:
     fig_caption: true
     latex_engine: pdflatex
     template: ../svm-latex-ms.tex
-title: "Political Donor Polarization: Observing Consumptive Behavior using a Network Approach"
-thanks: "Code and data available at: github.com/rossdahlke"
+title: "Opinion Change and Knowledge Levels of Deliberative Groups"
+thanks: "Code and data available at: github.com/rossdahlke/cs_230_project"
 author:
 - name: Ross Dahlke
 affiliation: Stanford University
@@ -21,7 +21,16 @@ bibliography: ../bibliography.bib
 biblio-style: apsr
 ---
 
+# 1. Introduction
 
+# 2. Dataset and Features
 
+# 3. Challenges
+
+# 4. Methods
+
+# 5. Evaluation
+
+# 6. Application
 
 # References
