@@ -6,7 +6,7 @@ output:
     fig_caption: true
     latex_engine: pdflatex
     template: ../svm-latex-ms.tex
-title: "Opinion Change and Knowledge Levels of Deliberative Groups"
+title: "Identifying Opinion Change and Knowledge Levels of Deliberative Groups"
 thanks: "Code and data available at: github.com/rossdahlke/cs_230_project"
 author:
 - name: Ross Dahlke
@@ -17,13 +17,21 @@ geometry: margin=1in
 fontfamily: mathpazo
 fontsize: 12pt
 spacing: double
-bibliography: ../bibliography.bib
+bibliography: ../proposal/bibliography.bib
 biblio-style: apsr
 ---
 
 # 1. Introduction
 
 # 2. Dataset and Features
+
+After meeting with Dr. Alice Siu, Associate Directory of the Center for Deliberative Democracy, I submitted a data request on 9/23/2020. As of writing this document, that data request as has not been processed. However, I do have a relatively good understanding of what the data will look like, once they come. Although there have been dozens of Deliberative Polls conducted across the world, many are not in English, have not been translated into English, or have high-quality transcriptions. I requested all datasets that have high-quality English transcriptions. I am anticipating at least three datasets from:
+
+  1. Uganda 
+  2. Stanford Undergraduates
+  3. American High Schoolers
+  
+In each of these datasets there should be transcripts from about 20 groups and the survey responses of the members of each of those groups. In total, I anticipate having about 60 total examples of transcripts and summarized survey results. Of these 60 examples, I plan to use 51 as a training set, 6 as a test set, and 3 as a validation set. 
 
 # 3. Challenges
 
