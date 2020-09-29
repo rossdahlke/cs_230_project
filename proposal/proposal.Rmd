@@ -23,24 +23,46 @@ biblio-style: apsr
 
 # 1. Introduction
 
-# 2. Dataset and Features
+Deliberative Polling asks, "What do people think if they are given information and circumstances to the discuss policy issues?" [@cdd] Stanford Professor Jim Fishkin and the Center for Deliberative Democracy (CDD) conduct Deliberative Polls where people come together for a weekend where they are polled on their opinions, spend the weekend deliberating in  groups, and are polled afterwards about their opinions. Fishkin finds that people change their opinions after deliberations. 
 
-After meeting with Dr. Alice Siu, Associate Directory of the Center for Deliberative Democracy, I submitted a data request on 9/23/2020. As of writing this document, that data request as has not been processed. However, I do have a relatively good understanding of what the data will look like, once they come. Although there have been dozens of Deliberative Polls conducted across the world, many are not in English, have not been translated into English, or have high-quality transcriptions. I requested all datasets that have high-quality English transcriptions. I am anticipating at least three datasets from:
+In this project, I will combine transcripts and survey results from Deliberative Polls to answer:
 
-  1. Uganda 
+**Can we build an NLP model that predicts whether a group will change their opinions?**
+  
+If time permits, I hope to deploy this model to predict opinion change on some deliberative group such as a town hall.
+  
+This project was inspired by previous research on attitude change in the "Change my View" subreddit [@cmv]. 
+
+# 2. Dataset/Features/Preprocessing
+
+Although there have been dozens of Deliberative Polls conducted across the world, many are not in English, have not been translated into English, or do not have high-quality English transcriptions. I requested all datasets that have high-quality English transcriptions from the CDD. I am anticipating at least three datasets from:
+
+  1. Ghana 
   2. Stanford Undergraduates
   3. American High Schoolers
   
-In each of these datasets there should be transcripts from about 20 groups and the survey responses of the members of each of those groups. In total, I anticipate having about 60 total examples of transcripts and summarized survey results. Of these 60 examples, I plan to use 51 as a training set, 6 as a test set, and 3 as a validation set. 
+In each of these datasets there are transcripts from about 20 groups and their survey responses. In total, I anticipate having about 60 examples of transcripts and survey results before and after deliberation. Of these 60 examples, I plan to use 51 as a training set, 6 as a test set, and 3 as a validation set. 
+
+Preprocessing will include all of the standard NLP preprocessing such as padding, truncation, and tokenization. Since I will be primarily using transformers, I will experiment whether text standardization such as punctuation, capitalization, and stop word removal improves the accuracy of the models.
 
 # 3. Challenges
 
-The biggest challenge will be training challenges of this project will be dealing with the relatively small number of training examples. If we are able to use pre-trained transformers, for our final project, I anticipate that this number training examples will be adequate given the rise of one- or few-shot learning.
+The biggest challenges of this project will be dealing with the small number of training examples. I will use pre-trained transformers to try to alleviate this issue. 
 
 # 4. Methods
 
+I will first try LSTM on the dataset to establish a baseline. However, given the small dataset that I'll be using, I primarily use transformers. I will test multiple models, including:
+
+  - XLNet
+  - BERT
+  - GPT-2
+  - CTRL
+  - Longformer
+  
+My hypothesis is that the detection of opinion change will not be based __how__ people talk instead of __what__ they talk about. I will experiment with different methods to capture this change in __how__ people talk by adding in linguistic features.  Early work has shown that incorporating sentence dependency features into one's model can improve performance [@komninos], but I hope to extend this work by incorporating sentence dependencies and other linguistic features such as average length of uninterrupted talking.
+
 # 5. Evaluation
 
-# 6. Application
+Quantitatively, I will evaluate on a discrete label of whether the group changed their opinion or not by using a confusion matrix to calculate recall, precision, and overall accuracy. Qualitatively, I will examine training data that is incorrectly classified to see if there are specific problems with that example such as anomalous lengths or deliberation content.
 
 # References

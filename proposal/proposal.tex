@@ -42,11 +42,13 @@
 
 
 
-\title{Opinion Change and Knowledge Levels of Deliberative Groups \thanks{Code and data available at: github.com/rossdahlke/cs\_230\_project}  }
+\title{Identifying Opinion Change and Knowledge Levels of Deliberative Groups
+(Natural Language Processing) \thanks{Code and data available at: github.com/rossdahlke/cs\_230\_project}  }
 
 
 
-\author{\Large Ross Dahlke\vspace{0.05in} \newline\normalsize\emph{}  }
+\author{\Large Ross Dahlke
+(\href{mailto:rdahlke@stanford.edu}{\nolinkurl{rdahlke@stanford.edu}})\vspace{0.05in} \newline\normalsize\emph{}  }
 
 
 \date{}
@@ -94,9 +96,11 @@
 \makeatother
 \hypersetup{breaklinks=true,
             bookmarks=true,
-            pdfauthor={Ross Dahlke ()},
+            pdfauthor={Ross Dahlke
+(\href{mailto:rdahlke@stanford.edu}{\nolinkurl{rdahlke@stanford.edu}}) ()},
              pdfkeywords = {},  
-            pdftitle={Opinion Change and Knowledge Levels of Deliberative Groups},
+            pdftitle={Identifying Opinion Change and Knowledge Levels of Deliberative Groups
+(Natural Language Processing)},
             colorlinks=true,
             citecolor=blue,
             urlcolor=blue,
@@ -135,7 +139,8 @@
 
 {
    \vskip 13.5pt\relax \normalsize\fontsize{11}{12} 
-\textbf{\authorfont Ross Dahlke} \hskip 15pt \emph{\small }   
+\textbf{\authorfont Ross Dahlke
+(\href{mailto:rdahlke@stanford.edu}{\nolinkurl{rdahlke@stanford.edu}})} \hskip 15pt \emph{\small }   
 
 }
 
@@ -156,23 +161,127 @@
 \hypertarget{introduction}{%
 \section{1. Introduction}\label{introduction}}
 
-\hypertarget{dataset-and-features}{%
-\section{2. Dataset and Features}\label{dataset-and-features}}
+Deliberative Polling asks, ``What do people think if they are given
+information and circumstances to the discuss policy issues?'' (Stanford
+University Center for Deliberative Democracy, n.d.) Stanford Professor
+Jim Fishkin and the Center for Deliberative Democracy (CDD) conduct
+Deliberative Polls where people come together for a weekend where they
+are polled on their opinions, spend the weekend deliberating in groups,
+and are polled afterwards about their opinions. Fishkin finds that
+people change their opinions after deliberations.
+
+In this project, I will combine transcripts and survey results from
+Deliberative Polls to answer:
+
+\textbf{Can we build an NLP model that predicts whether a group will
+change their opinions?}
+
+If time permits, I hope to deploy this model to predict opinion change
+on some deliberative group such as a town hall.
+
+This project was inspired by previous research on attitude change in the
+``Change my View'' subreddit (Priniski and Horne 2018).
+
+\hypertarget{datasetfeaturespreprocessing}{%
+\section{2.
+Dataset/Features/Preprocessing}\label{datasetfeaturespreprocessing}}
+
+Although there have been dozens of Deliberative Polls conducted across
+the world, many are not in English, have not been translated into
+English, or do not have high-quality English transcriptions. I requested
+all datasets that have high-quality English transcriptions from the CDD.
+I am anticipating at least three datasets from:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Ghana
+\item
+  Stanford Undergraduates
+\item
+  American High Schoolers
+\end{enumerate}
+
+In each of these datasets there are transcripts from about 20 groups and
+their survey responses. In total, I anticipate having about 60 examples
+of transcripts and survey results before and after deliberation. Of
+these 60 examples, I plan to use 51 as a training set, 6 as a test set,
+and 3 as a validation set.
+
+Preprocessing will include all of the standard NLP preprocessing such as
+padding, truncation, and tokenization. Since I will be primarily using
+transformers, I will experiment whether text standardization such as
+punctuation, capitalization, and stop word removal improves the accuracy
+of the models.
 
 \hypertarget{challenges}{%
 \section{3. Challenges}\label{challenges}}
 
+The biggest challenges of this project will be dealing with the small
+number of training examples. I will use pre-trained transformers to try
+to alleviate this issue.
+
 \hypertarget{methods}{%
 \section{4. Methods}\label{methods}}
+
+I will first try LSTM on the dataset to establish a baseline. However,
+given the small dataset that I'll be using, I primarily use
+transformers. I will test multiple models, including:
+
+\begin{itemize}
+\tightlist
+\item
+  XLNet
+\item
+  BERT
+\item
+  GPT-2
+\item
+  CTRL
+\item
+  Longformer
+\end{itemize}
+
+My hypothesis is that the detection of opinion change will not be based
+\textbf{how} people talk instead of \textbf{what} they talk about. I
+will experiment with different methods to capture this change in
+\textbf{how} people talk by adding in linguistic features. Early work
+has shown that incorporating sentence dependency features into one's
+model can improve performance (Komninos and Manandhar 2016), but I hope
+to extend this work by incorporating sentence dependencies and other
+linguistic features such as average length of uninterrupted talking.
 
 \hypertarget{evaluation}{%
 \section{5. Evaluation}\label{evaluation}}
 
-\hypertarget{application}{%
-\section{6. Application}\label{application}}
+Quantitatively, I will evaluate on a discrete label of whether the group
+changed their opinion or not by using a confusion matrix to calculate
+recall, precision, and overall accuracy. Qualitatively, I will examine
+training data that is incorrectly classified to see if there are
+specific problems with that example such as anomalous lengths or
+deliberation content.
 
 \hypertarget{references}{%
-\section{References}\label{references}}
+\section*{References}\label{references}}
+\addcontentsline{toc}{section}{References}
+
+\hypertarget{refs}{}
+\leavevmode\hypertarget{ref-komninos}{}%
+Komninos, Alexandros, and Suresh Manandhar. 2016. ``Dependency Based
+Embedding for Sentence Classification Tasks.'' \emph{Proceedings of
+NAACL-HLT}, June, 1490--1500.
+
+\leavevmode\hypertarget{ref-cmv}{}%
+Priniski, John Hunter, and Zach Horne. 2018. ``Attitude Change on
+Reddit's Change My View.'' \emph{Conference: Proceedings of the 40th
+Annual Meeting of the Cognitiee Science Society, Madison, Wisconsin}.
+\url{https://www.researchgate.net/publication/333175400_Attitude_Change_on_Reddit's_Change_My_View}.
+
+\leavevmode\hypertarget{ref-cdd}{}%
+Stanford University Center for Deliberative Democracy. n.d. ``What Is
+Deliberative Polling®?'' \emph{CDD}.
+\url{https://cdd.stanford.edu/what-is-deliberative-polling/}.
 
 
 
