@@ -41,7 +41,7 @@ Although there have been dozens of Deliberative Polls conducted across the world
   2. Stanford Undergraduates
   3. American High Schoolers
   
-In each of these datasets there are transcripts from about 20 groups and their survey responses. In total, I anticipate having about 60 examples of transcripts and survey results before and after deliberation. Of these 60 examples, I plan to use 51 as a training set, 6 as a test set, and 3 as a validation set. 
+In each of these datasets there are transcripts from about 20 groups and their survey responses. In total, I anticipate having about 60 examples of transcripts and survey results before and after deliberation. Of these 60 examples, I plan to use 51 as a training set, 6 as a test/ dev set, and 3 as a validation set. 
 
 Preprocessing will include all of the standard NLP preprocessing such as padding, truncation, and tokenization. Since I will be primarily using transformers, I will experiment whether text standardization such as punctuation, capitalization, and stop word removal improves the accuracy of the models.
 

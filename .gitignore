@@ -169,3 +169,9 @@ vignettes/*.pdf
 
 # R Environment Variables
 .Renviron
+
+# all data
+data/
+data/*
+
+.DS_Store
