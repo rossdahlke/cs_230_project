@@ -68,3 +68,11 @@ ghana_post_q2_summarized = ghana_post_q2.groupby("group", as_index = False)["q2"
 ghana_q2_delta = pd.DataFrame({"group": ghana_post_q2_summarized["group"], "delta": ghana_post_q2_summarized["q2"] - ghana_pre_q2_summarized["q2"]})
 ghana_q2_delta["id"] = "dp1_group" + ghana_q2_delta["group"].astype(str) + "_session1"
 ghana_q2_delta = ghana_q2_delta.drop(["group"], axis = 1)
+
+## Onto the Bududa
+bududa_and_butaleja = pd.read_excel("data/raw/surveys/uganda_Deliberative polling_Pre& Post Survey Data.xlsx")
+
+# going to add that random group for now
+
+bududa_pre = bududa_and_butaleja[((bududa_and_butaleja["000ID"].str.contains("BUD")) & (bududa_and_butaleja["001_Poll"] == 1))]
+bududa_pre = bududa_and_butaleja[((bududa_and_butaleja["000ID"].str.contains("BUD")) & (bududa_and_butaleja["001_Poll"] == 2))]
