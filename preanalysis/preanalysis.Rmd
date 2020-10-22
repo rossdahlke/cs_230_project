@@ -436,3 +436,275 @@ bududa_deltas %>%
   theme_bw() +
   theme(legend.position = "none")
 ```
+
+# Butaleja
+
+```{r}
+butaleja_groups <- foreign::read.dta("../data/raw/surveys/BUT Data-final.dta") %>% 
+  select(id, groupnumber = GroupNumber)
+
+butaleja <- readxl::read_xlsx("../data/raw/surveys/uganda_Deliberative polling_Pre& Post Survey Data.xlsx") %>% 
+  janitor::clean_names() %>%
+  mutate_at(vars(starts_with("x1")), funs(ifelse(. == 99, 5, .))) 
+
+butaleja_pre <- butaleja %>% 
+  filter(str_detect(x000id, "BUT") & x001_poll == 1) %>% 
+  left_join(butaleja_groups, by = c("x000id" = "id"))
+
+butaleja_post <- butaleja %>% 
+  filter(str_detect(x000id, "BUT") & x001_poll == 2) %>% 
+  left_join(butaleja_groups, by = c("x000id" = "id"))
+```
+
+## Land Management
+
+  - [28] "x114_planttrees_protectriverbeds"        
+  - [29] "x115_riverchannels_localgovernment"      
+  - [30] "x116_wetlands_dryseason"                 
+  - [31] "x117_riceschemes_notinwetlands"          
+  - [32] "x118_communities_maintainwaterchannels"  
+  - [33] "x119_communities_benefitscropdiversity"  
+  - [34] "x120_communities_de_silting"             
+  - [35] "x121_government_assistdesilting"         
+  - [36] "x122_communities_sanitationdrains"       
+  - [37] "x123_government_drillingcleanwater"      
+  - [38] "x124_communities_resourcesaccesswater" 
+
+```{r}
+butaleja_pre_summarized <- butaleja_pre %>% 
+  group_by(groupnumber) %>% 
+  summarize(pre_q114 = mean(x114_planttrees_protectriverbeds, na.rm = T),
+            pre_q115 = mean(x115_riverchannels_localgovernment, na.rm = T),
+            pre_q116 = mean(x116_wetlands_dryseason, na.rm = T),
+            pre_q117 = mean(x117_riceschemes_notinwetlands, na.rm = T),
+            pre_q118 = mean(x118_communities_maintainwaterchannels, na.rm = T),
+            pre_q119 = mean(x119_communities_benefitscropdiversity, na.rm = T),
+            pre_q120 = mean(x120_communities_de_silting, na.rm = T),
+            pre_q121 = mean(x121_government_assistdesilting, na.rm = T),
+            pre_q122 = mean(x122_communities_sanitationdrains, na.rm = T),
+            pre_q123 = mean(x123_government_drillingcleanwater, na.rm = T),
+            pre_q124 = mean(x124_communities_resourcesaccesswater, na.rm = T)) %>% 
+  mutate(pre_all = (pre_q114 + pre_q115 + pre_q115 + pre_q116 + pre_q117 + pre_q118 + pre_q119 + pre_q120 + pre_q121 + pre_q122 + pre_q123 + pre_q124) / 12)
+```
+
+```{r}
+butaleja_post_summarized <- butaleja_post %>% 
+  group_by(groupnumber) %>% 
+  summarize(post_q114 = mean(x114_planttrees_protectriverbeds, na.rm = T),
+            post_q115 = mean(x115_riverchannels_localgovernment, na.rm = T),
+            post_q116 = mean(x116_wetlands_dryseason, na.rm = T),
+            post_q117 = mean(x117_riceschemes_notinwetlands, na.rm = T),
+            post_q118 = mean(x118_communities_maintainwaterchannels, na.rm = T),
+            post_q119 = mean(x119_communities_benefitscropdiversity, na.rm = T),
+            post_q120 = mean(x120_communities_de_silting, na.rm = T),
+            post_q121 = mean(x121_government_assistdesilting, na.rm = T),
+            post_q122 = mean(x122_communities_sanitationdrains, na.rm = T),
+            post_q123 = mean(x123_government_drillingcleanwater, na.rm = T),
+            post_q124 = mean(x124_communities_resourcesaccesswater, na.rm = T)) %>% 
+  mutate(post_all = (post_q114 + post_q115 + post_q115 + post_q116 + post_q117 + post_q118 + post_q119 + post_q120 + post_q121 + post_q122 + post_q123 + post_q124) / 12)
+```
+
+```{r}
+butaleja_deltas <- butaleja_pre_summarized %>% 
+  left_join(butaleja_post_summarized) %>% 
+  mutate(delta_q114 = post_q114 - pre_q114,
+         delta_q115 = post_q115 - pre_q115,
+         delta_q116 = post_q116 - pre_q116,
+         delta_q117 = post_q117 - pre_q117,
+         delta_q118 = post_q118 - pre_q118,
+         delta_q119 = post_q119 - pre_q119,
+         delta_q120 = post_q120 - pre_q120,
+         delta_q121 = post_q121 - pre_q121,
+         delta_q122 = post_q122 - pre_q122,
+         delta_q123 = post_q123 - pre_q123,
+         delta_q124 = post_q124 - pre_q124,
+         delta_all = post_all - pre_all) 
+```
+
+There's quite a bit of variation across questions. However, it all seems to average out in the "delta_all". So, I'll keep them all for now. 
+
+```{r}
+butaleja_deltas %>% 
+  summarize_at(vars(contains("delta")), ~mean(.)) %>% 
+  knitr::kable()
+```
+
+```{r}
+butaleja_deltas %>% 
+  select(groupnumber, contains("delta")) %>% 
+  pivot_longer(-c(groupnumber)) %>% 
+  ggplot(aes(name, value, fill = name)) +
+  geom_boxplot() +
+  coord_flip() +
+  theme_bw() +
+  theme(legend.position = "none")
+```
+
+
+## Population Pressure
+
+  - [39] "x125_buildroads_accessmarkets"           
+  - [40] "x126_government_morebridges"             
+  - [41] "x127_government_raisenarrowbridges"      
+  - [42] "x128_newbuildings_highfloors"            
+  - [43] "x129_communities_ladders"                
+  - [44] "x130_government_oneclassschools"         
+  - [45] "x131_commties_girlsandboys"              
+  - [46] "x132_commties_technicalschools"          
+  - [47] "x133_government_enforceminimumageof18"   
+  - [48] "x134_resources_planningsizeoffamilies"   
+  - [49] "x135_education_familyplanning"           
+  - [50] "x136_healthcenter_i_is"                  
+  - [51] "x137_moreroads_fewerbridges"             
+
+```{r}
+butaleja_pre_summarized <- butaleja_pre %>% 
+  group_by(groupnumber) %>% 
+  summarize(pre_q125 = mean(x125_buildroads_accessmarkets, na.rm = T),
+            pre_q126 = mean(x126_government_morebridges, na.rm = T),
+            pre_q127 = mean(x127_government_raisenarrowbridges, na.rm = T),
+            pre_q128 = mean(x128_newbuildings_highfloors, na.rm = T),
+            pre_q129 = mean(x129_communities_ladders, na.rm = T),
+            pre_q130 = mean(x130_government_oneclassschools, na.rm = T),
+            pre_q131 = mean(x131_commties_girlsandboys, na.rm = T),
+            pre_q132 = mean(x132_commties_technicalschools, na.rm = T),
+            pre_q133 = mean(x133_government_enforceminimumageof18, na.rm = T),
+            pre_q134 = mean(x134_resources_planningsizeoffamilies, na.rm = T),
+            pre_q135 = mean(x135_education_familyplanning, na.rm = T),
+            pre_q136 = mean(x136_healthcenter_i_is, na.rm = T),
+            pre_q137 = mean(x137_moreroads_fewerbridges, na.rm = T)) %>% 
+  mutate(pre_all = (pre_q125 + pre_q126 + pre_q127 + pre_q128 + pre_q129 + pre_q130 + pre_q131 + pre_q132 + pre_q133 + pre_q134 + pre_q135 + pre_q136 + pre_q137) / 13)
+```
+
+```{r}
+butaleja_post_summarized <- butaleja_post %>% 
+  group_by(groupnumber) %>% 
+  summarize(post_q125 = mean(x125_buildroads_accessmarkets, na.rm = T),
+            post_q126 = mean(x126_government_morebridges, na.rm = T),
+            post_q127 = mean(x127_government_raisenarrowbridges, na.rm = T),
+            post_q128 = mean(x128_newbuildings_highfloors, na.rm = T),
+            post_q129 = mean(x129_communities_ladders, na.rm = T),
+            post_q130 = mean(x130_government_oneclassschools, na.rm = T),
+            post_q131 = mean(x131_commties_girlsandboys, na.rm = T),
+            post_q132 = mean(x132_commties_technicalschools, na.rm = T),
+            post_q133 = mean(x133_government_enforceminimumageof18, na.rm = T),
+            post_q134 = mean(x134_resources_planningsizeoffamilies, na.rm = T),
+            post_q135 = mean(x135_education_familyplanning, na.rm = T),
+            post_q136 = mean(x136_healthcenter_i_is, na.rm = T),
+            post_q137 = mean(x137_moreroads_fewerbridges, na.rm = T)) %>% 
+  mutate(post_all = (post_q125 + post_q126 + post_q127 + post_q128 + post_q129 + post_q130 + post_q131 + post_q132 + post_q133 + post_q134 + post_q135 + post_q136 + post_q137) / 13)
+```
+
+```{r}
+butaleja_deltas <- butaleja_pre_summarized %>% 
+  left_join(butaleja_post_summarized) %>% 
+  mutate(delta_q125 = post_q125 - pre_q125,
+         delta_q126 = post_q126 - pre_q126,
+         delta_q127 = post_q127 - pre_q127,
+         delta_q128 = post_q128 - pre_q128,
+         delta_q129 = post_q129 - pre_q129,
+         delta_q130 = post_q130 - pre_q130,
+         delta_q131 = post_q131 - pre_q131,
+         delta_q132 = post_q132 - pre_q132,
+         delta_q133 = post_q133 - pre_q133,
+         delta_q134 = post_q134 - pre_q134,
+         delta_q135 = post_q135 - pre_q135,
+         delta_q136 = post_q136 - pre_q136,
+         delta_q137 = post_q137 - pre_q137,
+         delta_all = post_all - pre_all) 
+```
+
+Again, there's quite a bit of variation. I'm going to remove 137 since it's such an outlier.
+
+```{r}
+butaleja_deltas %>% 
+  summarize_at(vars(contains("delta")), ~mean(.)) %>% 
+  knitr::kable()
+```
+
+```{r}
+butaleja_deltas %>% 
+  select(groupnumber, contains("delta")) %>% 
+  pivot_longer(-c(groupnumber)) %>% 
+  ggplot(aes(name, value, fill = name)) +
+  geom_boxplot() +
+  coord_flip() +
+  theme_bw() +
+  theme(legend.position = "none")
+```
+
+## Resettlement
+
+  - [15] "x101_rezoning"                           
+  - [16] "x102_compesation"                        
+  - [17] "x103_resettle_hostfamilies"              
+  - [18] "x104_support_hostfamilies"               
+  - [19] "x105_strengthen_dm_cs"                          
+  - [20] "x106_raisefunds_dm_cs"                   
+  - [21] "x107_training_dm_cs"                     
+  - [22] "x108_buildperi_urbancenterrs"            
+  - [23] "x109_newperi_urbancenters_nearby"  
+
+```{r}
+butaleja_pre_summarized <- butaleja_pre %>% 
+  group_by(groupnumber) %>% 
+  summarize(pre_q101 = mean(x101_rezoning, na.rm = T),
+            pre_q102 = mean(x102_compesation, na.rm = T),
+            pre_q103 = mean(x103_resettle_hostfamilies, na.rm = T),
+            pre_q104 = mean(x104_support_hostfamilies, na.rm = T),
+            pre_q105 = mean(x105_strengthen_dm_cs, na.rm = T),
+            pre_q106 = mean(x106_raisefunds_dm_cs, na.rm = T),
+            pre_q107 = mean(x107_training_dm_cs, na.rm = T),
+            pre_q108 = mean(x108_buildperi_urbancenterrs, na.rm = T),
+            pre_q109 = mean(x109_newperi_urbancenters_nearby, na.rm = T)) %>% 
+  mutate(pre_all = (pre_q101 + pre_q102 + pre_q103 + pre_q104 + pre_q105+ pre_q106 + pre_q107 + pre_q108 + pre_q109) / 9)
+```
+
+```{r}
+butaleja_post_summarized <- butaleja_post %>% 
+  group_by(groupnumber) %>% 
+  summarize(post_q101 = mean(x101_rezoning, na.rm = T),
+            post_q102 = mean(x102_compesation, na.rm = T),
+            post_q103 = mean(x103_resettle_hostfamilies, na.rm = T),
+            post_q104 = mean(x104_support_hostfamilies, na.rm = T),
+            post_q105 = mean(x105_strengthen_dm_cs, na.rm = T),
+            post_q106 = mean(x106_raisefunds_dm_cs, na.rm = T),
+            post_q107 = mean(x107_training_dm_cs, na.rm = T),
+            post_q108 = mean(x108_buildperi_urbancenterrs, na.rm = T),
+            post_q109 = mean(x109_newperi_urbancenters_nearby, na.rm = T)) %>% 
+  mutate(post_all = (post_q101 + post_q102 + post_q103 + post_q104 + post_q105+ post_q106 + post_q107 + post_q108 + post_q109) / 9)
+```
+
+```{r}
+butaleja_deltas <- butaleja_pre_summarized %>% 
+  left_join(butaleja_post_summarized) %>% 
+  mutate(delta_q101 = post_q101 - pre_q101,
+         delta_q102 = post_q102 - pre_q102,
+         delta_q103 = post_q103 - pre_q103,
+         delta_q104 = post_q104 - pre_q104,
+         delta_q105 = post_q105 - pre_q105,
+         delta_q106 = post_q106 - pre_q106,
+         delta_q107 = post_q107 - pre_q107,
+         delta_q108 = post_q108 - pre_q108,
+         delta_q109 = post_q109 - pre_q109,
+         delta_all = post_all - pre_all) 
+```
+
+Again, there's quite a bit of variation. I _could_  
+
+```{r}
+butaleja_deltas %>% 
+  summarize_at(vars(contains("delta")), ~mean(.)) %>% 
+  knitr::kable()
+```
+
+```{r}
+butaleja_deltas %>% 
+  select(groupnumber, contains("delta")) %>% 
+  pivot_longer(-c(groupnumber)) %>% 
+  ggplot(aes(name, value, fill = name)) +
+  geom_boxplot() +
+  coord_flip() +
+  theme_bw() +
+  theme(legend.position = "none")
+```
