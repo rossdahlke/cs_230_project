@@ -690,7 +690,7 @@ butaleja_deltas <- butaleja_pre_summarized %>%
          delta_all = post_all - pre_all) 
 ```
 
-Again, there's quite a bit of variation. I _could_  
+Again, there's quite a bit of variation. I _could_ remove 101, but I'll keep it for now.
 
 ```{r}
 butaleja_deltas %>% 
