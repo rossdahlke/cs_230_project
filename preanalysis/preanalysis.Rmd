@@ -40,6 +40,7 @@ ghana_pre <- read_csv("../data/raw/surveys/ghana-presurvey.csv") %>%
   mutate_at(vars(starts_with("q")), ~str_replace(., "Extremely important", "10")) %>% 
   mutate_at(vars(starts_with("q")), ~str_replace(., "Exactly in Middle", "5")) %>% 
   mutate_at(vars(starts_with("q")), ~str_replace(., "Extremely Unimportant", "0")) %>% 
+  mutate_at(vars(starts_with("q")), ~str_replace(., "99", "5")) %>% 
   mutate_at(vars(starts_with("q")), ~as.numeric(.)) %>% 
   mutate(formnumber = as.character(formnumber)) %>% 
   left_join(ghana_groups %>% select(-namerespon), by = "formnumber")
@@ -48,6 +49,7 @@ ghana_post <- read_csv("../data/raw/surveys/ghana-postsurvey.csv") %>%
   mutate_at(vars(starts_with("q")), ~str_replace(., "Extremely important", "10")) %>% 
   mutate_at(vars(starts_with("q")), ~str_replace(., "Exactly in Middle", "5")) %>% 
   mutate_at(vars(starts_with("q")), ~str_replace(., "Extremely Unimportant", "0")) %>% 
+  mutate_at(vars(starts_with("q")), ~str_replace(., "99", "5")) %>% 
   mutate_at(vars(starts_with("q")), ~as.numeric(.)) %>% 
   mutate(formnumber = as.character(formnumber)) %>% 
   left_join(ghana_groups %>% select(-formnumber), by = "namerespon")
@@ -78,6 +80,7 @@ ghana_post_summarized <- ghana_post %>%
             post_q14 = mean(q14, na.rm = T)) %>% 
   mutate(post_all = (post_q3 + post_q12 + post_q14) / 3)
 ```
+
 ```{r}
 ghana_deltas <- ghana_pre_summarized %>% 
   left_join(ghana_post_summarized) %>% 
@@ -93,6 +96,16 @@ Looks like the average delta is the same across all, so we can use all the group
 ghana_deltas %>% 
   summarize_at(vars(contains("delta")), ~mean(.)) %>% 
   knitr::kable()
+```
+```{r}
+ghana_deltas %>% 
+  select(groupnumber, contains("delta")) %>% 
+  pivot_longer(-c(groupnumber)) %>% 
+  ggplot(aes(name, value, fill = name)) +
+  geom_boxplot() +
+  coord_flip() +
+  theme_bw() +
+  theme(legend.position = "none")
 ```
 
 ## Water policy
@@ -141,6 +154,16 @@ ghana_deltas %>%
   summarize_at(vars(contains("delta")), ~mean(.)) %>% 
   knitr::kable()
 ```
+```{r}
+ghana_deltas %>% 
+  select(groupnumber, contains("delta")) %>% 
+  pivot_longer(-c(groupnumber)) %>% 
+  ggplot(aes(name, value, fill = name)) +
+  geom_boxplot() +
+  coord_flip() +
+  theme_bw() +
+  theme(legend.position = "none")
+```
 
 ## Bududa
 
@@ -149,11 +172,187 @@ bududa_groups <- foreign::read.dta("../data/raw/surveys/BUD data with group numb
   select(id, groupnumber = GroupNumber)
 
 bududa <- readxl::read_xlsx("../data/raw/surveys/uganda_Deliberative polling_Pre& Post Survey Data.xlsx") %>% 
-  janitor::clean_names()
+  janitor::clean_names() %>%
+  mutate_at(vars(starts_with("x1")), funs(ifelse(. == 99, 5, .))) 
+  
 
 bududa_pre <- bududa %>% 
   filter(str_detect(x000id, "BUD") & x001_poll == 1) %>% 
   left_join(bududa_groups, by = c("x000id" = "id"))
 
+bududa_post <- bududa %>% 
+  filter(str_detect(x000id, "BUD") & x001_poll == 2) %>% 
+  left_join(bududa_groups, by = c("x000id" = "id"))
+```
 
+## Land Management
+
+  - [28] "x114_planttrees_protectriverbeds"        
+  - [29] "x115_riverchannels_localgovernment"      
+  - [30] "x116_wetlands_dryseason"                 
+  - [31] "x117_riceschemes_notinwetlands"          
+  - [32] "x118_communities_maintainwaterchannels"  
+  - [33] "x119_communities_benefitscropdiversity"  
+  - [34] "x120_communities_de_silting"             
+  - [35] "x121_government_assistdesilting"         
+  - [36] "x122_communities_sanitationdrains"       
+  - [37] "x123_government_drillingcleanwater"      
+  - [38] "x124_communities_resourcesaccesswater" 
+
+```{r}
+bududa_pre_summarized <- bududa_pre %>% 
+  group_by(groupnumber) %>% 
+  summarize(pre_q114 = mean(x114_planttrees_protectriverbeds, na.rm = T),
+            pre_q115 = mean(x115_riverchannels_localgovernment, na.rm = T),
+            pre_q116 = mean(x116_wetlands_dryseason, na.rm = T),
+            pre_q117 = mean(x117_riceschemes_notinwetlands, na.rm = T),
+            pre_q118 = mean(x118_communities_maintainwaterchannels, na.rm = T),
+            pre_q119 = mean(x119_communities_benefitscropdiversity, na.rm = T),
+            pre_q120 = mean(x120_communities_de_silting, na.rm = T),
+            pre_q121 = mean(x121_government_assistdesilting, na.rm = T),
+            pre_q122 = mean(x122_communities_sanitationdrains, na.rm = T),
+            pre_q123 = mean(x123_government_drillingcleanwater, na.rm = T),
+            pre_q124 = mean(x124_communities_resourcesaccesswater, na.rm = T)) %>% 
+  mutate(pre_all = (pre_q114 + pre_q115 + pre_q115 + pre_q116 + pre_q117 + pre_q118 + pre_q119 + pre_q120 + pre_q121 + pre_q122 + pre_q123 + pre_q124) / 12)
+```
+
+```{r}
+bududa_post_summarized <- bududa_post %>% 
+  group_by(groupnumber) %>% 
+  summarize(post_q114 = mean(x114_planttrees_protectriverbeds, na.rm = T),
+            post_q115 = mean(x115_riverchannels_localgovernment, na.rm = T),
+            post_q116 = mean(x116_wetlands_dryseason, na.rm = T),
+            post_q117 = mean(x117_riceschemes_notinwetlands, na.rm = T),
+            post_q118 = mean(x118_communities_maintainwaterchannels, na.rm = T),
+            post_q119 = mean(x119_communities_benefitscropdiversity, na.rm = T),
+            post_q120 = mean(x120_communities_de_silting, na.rm = T),
+            post_q121 = mean(x121_government_assistdesilting, na.rm = T),
+            post_q122 = mean(x122_communities_sanitationdrains, na.rm = T),
+            post_q123 = mean(x123_government_drillingcleanwater, na.rm = T),
+            post_q124 = mean(x124_communities_resourcesaccesswater, na.rm = T)) %>% 
+  mutate(post_all = (post_q114 + post_q115 + post_q115 + post_q116 + post_q117 + post_q118 + post_q119 + post_q120 + post_q121 + post_q122 + post_q123 + post_q124) / 12)
+```
+
+```{r}
+bududa_deltas <- bududa_pre_summarized %>% 
+  left_join(bududa_post_summarized) %>% 
+  mutate(delta_q114 = post_q114 - pre_q114,
+         delta_q115 = post_q115 - pre_q115,
+         delta_q116 = post_q116 - pre_q116,
+         delta_q117 = post_q117 - pre_q117,
+         delta_q118 = post_q118 - pre_q118,
+         delta_q119 = post_q119 - pre_q119,
+         delta_q120 = post_q120 - pre_q120,
+         delta_q121 = post_q121 - pre_q121,
+         delta_q122 = post_q122 - pre_q122,
+         delta_q123 = post_q123 - pre_q123,
+         delta_q124 = post_q124 - pre_q124,
+         delta_all = post_all - pre_all) 
+```
+
+There's quite a bit of variation across questions. However, it all seems to average out in the "delta_all". So, I'll keep them all for now. 
+
+```{r}
+bududa_deltas %>% 
+  summarize_at(vars(contains("delta")), ~mean(.)) %>% 
+  knitr::kable()
+```
+
+```{r}
+bududa_deltas %>% 
+  select(groupnumber, contains("delta")) %>% 
+  pivot_longer(-c(groupnumber)) %>% 
+  ggplot(aes(name, value, fill = name)) +
+  geom_boxplot() +
+  coord_flip() +
+  theme_bw() +
+  theme(legend.position = "none")
+```
+
+## Population pressure
+
+  - [39] "x125_buildroads_accessmarkets"           
+  - [40] "x126_government_morebridges"             
+  - [41] "x127_government_raisenarrowbridges"      
+  - [42] "x128_newbuildings_highfloors"            
+[43] "x129_communities_ladders"                
+[44] "x130_government_oneclassschools"         
+[45] "x131_commties_girlsandboys"              
+[46] "x132_commties_technicalschools"          
+[47] "x133_government_enforceminimumageof18"   
+[48] "x134_resources_planningsizeoffamilies"   
+[49] "x135_education_familyplanning"           
+[50] "x136_healthcenter_i_is"                  
+[51] "x137_moreroads_fewerbridges"             
+[52] "x138a_diversifyingcrops_livelihood"      
+[53] "x138b_diversifyingcrops_nutrition" 
+
+```{r}
+bududa_pre_summarized <- bududa_pre %>% 
+  group_by(groupnumber) %>% 
+  summarize(pre_q114 = mean(x114_planttrees_protectriverbeds, na.rm = T),
+            pre_q115 = mean(x115_riverchannels_localgovernment, na.rm = T),
+            pre_q116 = mean(x116_wetlands_dryseason, na.rm = T),
+            pre_q117 = mean(x117_riceschemes_notinwetlands, na.rm = T),
+            pre_q118 = mean(x118_communities_maintainwaterchannels, na.rm = T),
+            pre_q119 = mean(x119_communities_benefitscropdiversity, na.rm = T),
+            pre_q120 = mean(x120_communities_de_silting, na.rm = T),
+            pre_q121 = mean(x121_government_assistdesilting, na.rm = T),
+            pre_q122 = mean(x122_communities_sanitationdrains, na.rm = T),
+            pre_q123 = mean(x123_government_drillingcleanwater, na.rm = T),
+            pre_q124 = mean(x124_communities_resourcesaccesswater, na.rm = T)) %>% 
+  mutate(pre_all = (pre_q114 + pre_q115 + pre_q115 + pre_q116 + pre_q117 + pre_q118 + pre_q119 + pre_q120 + pre_q121 + pre_q122 + pre_q123 + pre_q124) / 12)
+```
+
+```{r}
+bududa_post_summarized <- bududa_post %>% 
+  group_by(groupnumber) %>% 
+  summarize(post_q114 = mean(x114_planttrees_protectriverbeds, na.rm = T),
+            post_q115 = mean(x115_riverchannels_localgovernment, na.rm = T),
+            post_q116 = mean(x116_wetlands_dryseason, na.rm = T),
+            post_q117 = mean(x117_riceschemes_notinwetlands, na.rm = T),
+            post_q118 = mean(x118_communities_maintainwaterchannels, na.rm = T),
+            post_q119 = mean(x119_communities_benefitscropdiversity, na.rm = T),
+            post_q120 = mean(x120_communities_de_silting, na.rm = T),
+            post_q121 = mean(x121_government_assistdesilting, na.rm = T),
+            post_q122 = mean(x122_communities_sanitationdrains, na.rm = T),
+            post_q123 = mean(x123_government_drillingcleanwater, na.rm = T),
+            post_q124 = mean(x124_communities_resourcesaccesswater, na.rm = T)) %>% 
+  mutate(post_all = (post_q114 + post_q115 + post_q115 + post_q116 + post_q117 + post_q118 + post_q119 + post_q120 + post_q121 + post_q122 + post_q123 + post_q124) / 12)
+```
+
+```{r}
+bududa_deltas <- bududa_pre_summarized %>% 
+  left_join(bududa_post_summarized) %>% 
+  mutate(delta_q114 = post_q114 - pre_q114,
+         delta_q115 = post_q115 - pre_q115,
+         delta_q116 = post_q116 - pre_q116,
+         delta_q117 = post_q117 - pre_q117,
+         delta_q118 = post_q118 - pre_q118,
+         delta_q119 = post_q119 - pre_q119,
+         delta_q120 = post_q120 - pre_q120,
+         delta_q121 = post_q121 - pre_q121,
+         delta_q122 = post_q122 - pre_q122,
+         delta_q123 = post_q123 - pre_q123,
+         delta_q124 = post_q124 - pre_q124,
+         delta_all = post_all - pre_all) 
+```
+
+There's quite a bit of variation across questions. However, it all seems to average out in the "delta_all". So, I'll keep them all for now. 
+
+```{r}
+bududa_deltas %>% 
+  summarize_at(vars(contains("delta")), ~mean(.)) %>% 
+  knitr::kable()
+```
+
+```{r}
+bududa_deltas %>% 
+  select(groupnumber, contains("delta")) %>% 
+  pivot_longer(-c(groupnumber)) %>% 
+  ggplot(aes(name, value, fill = name)) +
+  geom_boxplot() +
+  coord_flip() +
+  theme_bw() +
+  theme(legend.position = "none")
 ```
