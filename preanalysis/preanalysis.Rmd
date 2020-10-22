@@ -95,4 +95,65 @@ ghana_deltas %>%
   knitr::kable()
 ```
 
+## Water policy
 
+The following questions have to do with food safety and livelihood:
+
+  - q5
+  - q20
+  - q29
+  - q33
+
+```{r}
+ghana_pre_summarized <- ghana_pre %>% 
+  group_by(groupnumber) %>% 
+  summarize(pre_q5 = mean(q5, na.rm = T),
+            pre_q20 = mean(q20, na.rm = T),
+            pre_q29 = mean(q29, na.rm = T),
+            pre_q33 = mean(q33, na.rm = T)) %>% 
+  mutate(pre_all = (pre_q5 + pre_q20 + pre_q29 + pre_q33) / 4)
+```
+
+```{r}
+ghana_post_summarized <- ghana_post %>% 
+  group_by(groupnumber) %>% 
+  summarize(post_q5 = mean(q5, na.rm = T),
+            post_q20 = mean(q20, na.rm = T),
+            post_q29 = mean(q29, na.rm = T),
+            post_q33 = mean(q33, na.rm = T)) %>% 
+  mutate(post_all = (post_q5 + post_q20 + post_q29 + post_q33) / 4)
+```
+
+```{r}
+ghana_deltas <- ghana_pre_summarized %>% 
+  left_join(ghana_post_summarized) %>% 
+  mutate(delta_q5 = post_q5 - pre_q5,
+         delta_q20 = post_q20 - pre_q20,
+         delta_q29 = post_q29 - pre_q29,
+         delta_q33 = post_q33 - pre_q33,
+         delta_all = post_all - pre_all) 
+```
+
+All the deltas are relatively close except q20, so I'll use all but that one.
+
+```{r}
+ghana_deltas %>% 
+  summarize_at(vars(contains("delta")), ~mean(.)) %>% 
+  knitr::kable()
+```
+
+## Bududa
+
+```{r}
+bududa_groups <- foreign::read.dta("../data/raw/surveys/BUD data with group numbers.dta") %>% 
+  select(id, groupnumber = GroupNumber)
+
+bududa <- readxl::read_xlsx("../data/raw/surveys/uganda_Deliberative polling_Pre& Post Survey Data.xlsx") %>% 
+  janitor::clean_names()
+
+bududa_pre <- bududa %>% 
+  filter(str_detect(x000id, "BUD") & x001_poll == 1) %>% 
+  left_join(bududa_groups, by = c("x000id" = "id"))
+
+
+```
