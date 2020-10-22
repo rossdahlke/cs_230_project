@@ -1,0 +1,98 @@
+---
+output:
+  pdf_document:
+    # citation_package: biblatex
+    keep_tex: true
+    fig_caption: true
+    latex_engine: pdflatex
+    template: ../svm-latex-ms.tex
+title: "CS 230 Project: Preanalysis"
+thanks: "Code and data available at: github.com/rossdahlke/cs_230_project"
+author:
+- name: Ross Dahlke (rdahlke@stanford.edu)
+affiliation: Stanford University
+abstract: ""
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+geometry: margin=1in
+fontfamily: mathpazo
+fontsize: 12pt
+spacing: double
+bibliography: ../proposal/bibliography.bib
+biblio-style: apsr
+---
+
+```{r include = F}
+knitr::opts_chunk$set(echo = F, warning = F, message = F)
+library(tidyverse)
+```
+
+# The main purpose of this document is to analyze the results of the DPs in order to determine which questions should be used in the analysis.
+
+I will calculate on which issues opinions change the most, or if I can even use an average of all of the questions.
+
+## Ghana
+
+```{r}
+ghana_groups <- read_csv("../data/raw/surveys/ghana-mergedataset.csv") %>% 
+  select(namerespon, formnumber, groupnumber)
+
+ghana_pre <- read_csv("../data/raw/surveys/ghana-presurvey.csv") %>% 
+  mutate_at(vars(starts_with("q")), ~str_replace(., "Extremely important", "10")) %>% 
+  mutate_at(vars(starts_with("q")), ~str_replace(., "Exactly in Middle", "5")) %>% 
+  mutate_at(vars(starts_with("q")), ~str_replace(., "Extremely Unimportant", "0")) %>% 
+  mutate_at(vars(starts_with("q")), ~as.numeric(.)) %>% 
+  mutate(formnumber = as.character(formnumber)) %>% 
+  left_join(ghana_groups %>% select(-namerespon), by = "formnumber")
+
+ghana_post <- read_csv("../data/raw/surveys/ghana-postsurvey.csv") %>% 
+  mutate_at(vars(starts_with("q")), ~str_replace(., "Extremely important", "10")) %>% 
+  mutate_at(vars(starts_with("q")), ~str_replace(., "Exactly in Middle", "5")) %>% 
+  mutate_at(vars(starts_with("q")), ~str_replace(., "Extremely Unimportant", "0")) %>% 
+  mutate_at(vars(starts_with("q")), ~as.numeric(.)) %>% 
+  mutate(formnumber = as.character(formnumber)) %>% 
+  left_join(ghana_groups %>% select(-formnumber), by = "namerespon")
+```
+
+### Food Safety and Livelihood
+
+The following questions have to do with food safety and livelihood:
+
+  - q3
+  - q12
+  - q14
+
+```{r}
+ghana_pre_summarized <- ghana_pre %>% 
+  group_by(groupnumber) %>% 
+  summarize(pre_q3 = mean(q3, na.rm = T),
+            pre_q12 = mean(q12, na.rm = T),
+            pre_q14 = mean(q14, na.rm = T)) %>% 
+  mutate(pre_all = (pre_q3 + pre_q12 + pre_q14) / 3)
+```
+
+```{r}
+ghana_post_summarized <- ghana_post %>% 
+  group_by(groupnumber) %>% 
+  summarize(post_q3 = mean(q3, na.rm = T),
+            post_q12 = mean(q12, na.rm = T),
+            post_q14 = mean(q14, na.rm = T)) %>% 
+  mutate(post_all = (post_q3 + post_q12 + post_q14) / 3)
+```
+```{r}
+ghana_deltas <- ghana_pre_summarized %>% 
+  left_join(ghana_post_summarized) %>% 
+  mutate(delta_q3 = post_q3 - pre_q3,
+         delta_q12 = post_q12 - pre_q12,
+         delta_q14 = post_q14 - pre_q14,
+         delta_all = post_all - pre_all) 
+```
+
+Looks like the average delta is the same across all, so we can use all the groups.
+
+```{r}
+ghana_deltas %>% 
+  summarize_at(vars(contains("delta")), ~mean(.)) %>% 
+  knitr::kable()
+```
+
+
