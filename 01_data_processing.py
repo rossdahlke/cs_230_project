@@ -38,36 +38,34 @@ ghana_pre["group"] = ghana_pre["group"].replace([4], [15])
 ghana_post["group"] = np.random.randint(1, 13, ghana_post.shape[0])
 ghana_post["group"] = ghana_post["group"].replace([4], [15])
 
-# unfortunately I do not have a key for know what the survey questions asked, I'll just use q1 and q2 as the responses to the issues discussed in the sessions
-# have to do a little work to clean up responses
-ghana_pre[["q1", "q2"]] = ghana_pre[["q1", "q2"]].replace(["Extremely important", "Exactly in Middle", "Extremely Unimportant", "Don't know"], [10, 5, 0, None])
-ghana_post[["q1", "q2"]] = ghana_post[["q1", "q2"]].replace(["Extremely important", "Exactly in Middle", "Extremely Unimportant", "Don't know"], [10, 5, 0, None])
+# cleaning up the questions I will ultimately use
+# don't have good data on movement since I don't know group number
+# I'll just use all topic related questions until I get that information
+ghana_pre[["q3", "q12", "q14", "q41d", "q5", "q20", "q29", "q33"]] = ghana_pre[["q3", "q12", "q14", "q41d", "q5", "q20", "q29", "q33"]].replace(["Extremely important", "Exactly in Middle", "Extremely Unimportant", "Don't know"], [10, 5, 0, None])
+ghana_post[["q3", "q12", "q14", "q41d", "q5", "q20", "q29", "q33"]] = ghana_pre[["q3", "q12", "q14", "q41d", "q5", "q20", "q29", "q33"]].replace(["Extremely important", "Exactly in Middle", "Extremely Unimportant", "Don't know"], [10, 5, 0, None])
 
-# q1
-ghana_pre_q1 = ghana_pre[(ghana_pre["q1"] != "NA")]
-ghana_pre_q1["q1"] = pd.to_numeric(ghana_pre_q1["q1"])
-ghana_pre_q1_summarized = ghana_pre_q1.groupby("group", as_index = False)["q1"].mean()
+# not going to include 41d for now, if I want to include in the future, I will have to clean up the column
+# food safety/ livelihood
+ghana_pre["qfood"] = pd.to_numeric(ghana_pre["q3"]) + pd.to_numeric(ghana_pre["q12"]) + pd.to_numeric(ghana_pre["q14"])
+ghana_pre_qfood = ghana_pre.groupby("group", as_index = False)["qfood"].mean()
 
-ghana_post_q1 = ghana_post[(ghana_post["q1"] != "NA")]
-ghana_post_q1["q1"] = pd.to_numeric(ghana_post_q1["q1"])
-ghana_post_q1_summarized = ghana_post_q1.groupby("group", as_index = False)["q1"].mean()
+ghana_post["qfood"] = pd.to_numeric(ghana_post["q3"]) + pd.to_numeric(ghana_post["q12"]) + pd.to_numeric(ghana_post["q14"])
+ghana_post_qfood = ghana_post.groupby("group", as_index = False)["qfood"].mean()
 
-ghana_q1_delta = pd.DataFrame({"group": ghana_post_q1_summarized["group"], "delta": ghana_post_q1_summarized["q1"] - ghana_pre_q1_summarized["q1"]})
-ghana_q1_delta["id"] = "dp1_group" + ghana_q1_delta["group"].astype(str) + "_session1"
-ghana_q1_delta = ghana_q1_delta.drop(["group"], axis = 1)
+ghana_qfood_delta = pd.DataFrame({"group": ghana_post_qfood["group"], "delta": ghana_post_qfood["qfood"] - ghana_pre_qfood["qfood"]})
+ghana_qfood_delta["id"] = "dp1_group" + ghana_qfood_delta["group"].astype(str) + "_session1"
+ghana_qfood_delta = ghana_qfood_delta.drop(["group"], axis = 1)
 
-# q2
-ghana_pre_q2 = ghana_pre[(ghana_pre["q2"] != "NA")]
-ghana_pre_q2["q2"] = pd.to_numeric(ghana_pre_q2["q2"])
-ghana_pre_q2_summarized = ghana_pre_q2.groupby("group", as_index = False)["q2"].mean()
+# water policy
+ghana_pre["qwater"] = pd.to_numeric(ghana_pre["q5"]) + pd.to_numeric(ghana_pre["q20"]) + pd.to_numeric(ghana_pre["q29"]) + pd.to_numeric(ghana_pre["q33"])
+ghana_pre_qwater = ghana_pre.groupby("group", as_index = False)["qfood"].mean()
 
-ghana_post_q2 = ghana_post[(ghana_post["q2"] != "NA")]
-ghana_post_q2["q2"] = pd.to_numeric(ghana_post_q1["q2"])
-ghana_post_q2_summarized = ghana_post_q2.groupby("group", as_index = False)["q2"].mean()
+ghana_post["qwater"] = pd.to_numeric(ghana_pre["q5"]) + pd.to_numeric(ghana_pre["q20"]) + pd.to_numeric(ghana_pre["q29"]) + pd.to_numeric(ghana_pre["q33"])
+ghana_post_qwater = ghana_post.groupby("group", as_index = False)["qfood"].mean()
 
-ghana_q2_delta = pd.DataFrame({"group": ghana_post_q2_summarized["group"], "delta": ghana_post_q2_summarized["q2"] - ghana_pre_q2_summarized["q2"]})
-ghana_q2_delta["id"] = "dp1_group" + ghana_q2_delta["group"].astype(str) + "_session1"
-ghana_q2_delta = ghana_q2_delta.drop(["group"], axis = 1)
+ghana_qwater_delta = pd.DataFrame({"group": ghana_post_qwater["group"], "delta": ghana_post_qwater["qfood"] - ghana_pre_qwater["qfood"]})
+ghana_qwater_delta["id"] = "dp1_group" + ghana_qwater_delta["group"].astype(str) + "_session1"
+ghana_qwater_delta = ghana_qwater_delta.drop(["group"], axis = 1)
 
 ## Onto the Bududa
 bududa_and_butaleja = pd.read_excel("data/raw/surveys/uganda_Deliberative polling_Pre& Post Survey Data.xlsx")
