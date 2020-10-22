@@ -42,7 +42,7 @@ ghana_post["group"] = ghana_post["group"].replace([4], [15])
 # don't have good data on movement since I don't know group number
 # I'll just use all topic related questions until I get that information
 ghana_pre[["q3", "q12", "q14", "q41d", "q5", "q20", "q29", "q33"]] = ghana_pre[["q3", "q12", "q14", "q41d", "q5", "q20", "q29", "q33"]].replace(["Extremely important", "Exactly in Middle", "Extremely Unimportant", "Don't know"], [10, 5, 0, None])
-ghana_post[["q3", "q12", "q14", "q41d", "q5", "q20", "q29", "q33"]] = ghana_pre[["q3", "q12", "q14", "q41d", "q5", "q20", "q29", "q33"]].replace(["Extremely important", "Exactly in Middle", "Extremely Unimportant", "Don't know"], [10, 5, 0, None])
+ghana_post[["q3", "q12", "q14", "q41d", "q5", "q20", "q29", "q33"]] = ghana_post[["q3", "q12", "q14", "q41d", "q5", "q20", "q29", "q33"]].replace(["Extremely important", "Exactly in Middle", "Extremely Unimportant", "Don't know"], [10, 5, 0, None])
 
 # not going to include 41d for now, if I want to include in the future, I will have to clean up the column
 # food safety/ livelihood
@@ -70,7 +70,12 @@ ghana_qwater_delta = ghana_qwater_delta.drop(["group"], axis = 1)
 ## Onto the Bududa
 bududa_and_butaleja = pd.read_excel("data/raw/surveys/uganda_Deliberative polling_Pre& Post Survey Data.xlsx")
 
-# going to add that random group for now
-
+# going to add that random group for now, same as Ghana
 bududa_pre = bududa_and_butaleja[((bududa_and_butaleja["000ID"].str.contains("BUD")) & (bududa_and_butaleja["001_Poll"] == 1))]
-bududa_pre = bududa_and_butaleja[((bududa_and_butaleja["000ID"].str.contains("BUD")) & (bududa_and_butaleja["001_Poll"] == 2))]
+bududa_post = bududa_and_butaleja[((bududa_and_butaleja["000ID"].str.contains("BUD")) & (bududa_and_butaleja["001_Poll"] == 2))]
+
+bududa_pre["group"] = np.random.randint(1, 13, bududa_pre.shape[0])
+bududa_pre["group"] = bududa_pre["group"].replace([12], [14])
+
+bududa_post["group"] = np.random.randint(1, 13, bududa_post.shape[0])
+bududa_post["group"] = bududa_post["group"].replace([12], [14])

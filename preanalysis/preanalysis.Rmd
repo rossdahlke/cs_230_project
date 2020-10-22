@@ -275,32 +275,32 @@ bududa_deltas %>%
   - [40] "x126_government_morebridges"             
   - [41] "x127_government_raisenarrowbridges"      
   - [42] "x128_newbuildings_highfloors"            
-[43] "x129_communities_ladders"                
-[44] "x130_government_oneclassschools"         
-[45] "x131_commties_girlsandboys"              
-[46] "x132_commties_technicalschools"          
-[47] "x133_government_enforceminimumageof18"   
-[48] "x134_resources_planningsizeoffamilies"   
-[49] "x135_education_familyplanning"           
-[50] "x136_healthcenter_i_is"                  
-[51] "x137_moreroads_fewerbridges"             
-[52] "x138a_diversifyingcrops_livelihood"      
-[53] "x138b_diversifyingcrops_nutrition" 
+  - [43] "x129_communities_ladders"                
+  - [44] "x130_government_oneclassschools"         
+  - [45] "x131_commties_girlsandboys"              
+  - [46] "x132_commties_technicalschools"          
+  - [47] "x133_government_enforceminimumageof18"   
+  - [48] "x134_resources_planningsizeoffamilies"   
+  - [49] "x135_education_familyplanning"           
+  - [50] "x136_healthcenter_i_is"                  
+  - [51] "x137_moreroads_fewerbridges"             
 
 ```{r}
 bududa_pre_summarized <- bududa_pre %>% 
   group_by(groupnumber) %>% 
-  summarize(pre_q114 = mean(x114_planttrees_protectriverbeds, na.rm = T),
-            pre_q115 = mean(x115_riverchannels_localgovernment, na.rm = T),
-            pre_q116 = mean(x116_wetlands_dryseason, na.rm = T),
-            pre_q117 = mean(x117_riceschemes_notinwetlands, na.rm = T),
-            pre_q118 = mean(x118_communities_maintainwaterchannels, na.rm = T),
-            pre_q119 = mean(x119_communities_benefitscropdiversity, na.rm = T),
-            pre_q120 = mean(x120_communities_de_silting, na.rm = T),
-            pre_q121 = mean(x121_government_assistdesilting, na.rm = T),
-            pre_q122 = mean(x122_communities_sanitationdrains, na.rm = T),
-            pre_q123 = mean(x123_government_drillingcleanwater, na.rm = T),
-            pre_q124 = mean(x124_communities_resourcesaccesswater, na.rm = T)) %>% 
+  summarize(pre_q125 = mean(x125_buildroads_accessmarkets, na.rm = T),
+            pre_q126 = mean(x126_government_morebridges, na.rm = T),
+            pre_q127 = mean(x116_wetlands_dryseason, na.rm = T),
+            pre_q128 = mean(x117_riceschemes_notinwetlands, na.rm = T),
+            pre_q129 = mean(x118_communities_maintainwaterchannels, na.rm = T),
+            pre_q130 = mean(x119_communities_benefitscropdiversity, na.rm = T),
+            pre_q131 = mean(x120_communities_de_silting, na.rm = T),
+            pre_q132 = mean(x121_government_assistdesilting, na.rm = T),
+            pre_q133 = mean(x122_communities_sanitationdrains, na.rm = T),
+            pre_q134 = mean(x123_government_drillingcleanwater, na.rm = T),
+            pre_q135 = mean(x124_communities_resourcesaccesswater, na.rm = T),
+            pre_q136 = mean(x124_communities_resourcesaccesswater, na.rm = T),
+            pre_q137 = mean(x124_communities_resourcesaccesswater, na.rm = T)) %>% 
   mutate(pre_all = (pre_q114 + pre_q115 + pre_q115 + pre_q116 + pre_q117 + pre_q118 + pre_q119 + pre_q120 + pre_q121 + pre_q122 + pre_q123 + pre_q124) / 12)
 ```
 
@@ -308,7 +308,7 @@ bududa_pre_summarized <- bududa_pre %>%
 bududa_post_summarized <- bududa_post %>% 
   group_by(groupnumber) %>% 
   summarize(post_q114 = mean(x114_planttrees_protectriverbeds, na.rm = T),
-            post_q115 = mean(x115_riverchannels_localgovernment, na.rm = T),
+             post_q115 = mean(x115_riverchannels_localgovernment, na.rm = T),
             post_q116 = mean(x116_wetlands_dryseason, na.rm = T),
             post_q117 = mean(x117_riceschemes_notinwetlands, na.rm = T),
             post_q118 = mean(x118_communities_maintainwaterchannels, na.rm = T),
