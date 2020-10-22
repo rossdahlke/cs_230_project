@@ -64,7 +64,7 @@ ghana_post["qwater"] = pd.to_numeric(ghana_pre["q5"]) + pd.to_numeric(ghana_pre[
 ghana_post_qwater = ghana_post.groupby("group", as_index = False)["qfood"].mean()
 
 ghana_qwater_delta = pd.DataFrame({"group": ghana_post_qwater["group"], "delta": ghana_post_qwater["qfood"] - ghana_pre_qwater["qfood"]})
-ghana_qwater_delta["id"] = "dp1_group" + ghana_qwater_delta["group"].astype(str) + "_session1"
+ghana_qwater_delta["id"] = "dp1_group" + ghana_qwater_delta["group"].astype(str) + "_session2"
 ghana_qwater_delta = ghana_qwater_delta.drop(["group"], axis = 1)
 
 ## Onto the Bududa
