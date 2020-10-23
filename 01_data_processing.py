@@ -42,42 +42,48 @@ ghana_pre = ghana_pre.merge(ghana_groups[["formnumber", "groupnumber"]], how = "
 ghana_post = ghana_post.merge(ghana_groups[["namerespon", "groupnumber"]], how = "left", on = "namerespon")
 
 # cleaning up the questions I will ultimately use
-# don't have good data on movement since I don't know group number
-# I'll just use all topic related questions until I get that information
+# replace "99" (no response) with 5s (middle of the likert scale)
+# could get fancier in the future with interpolation in the future
 ghana_pre[["q3", "q12", "q14", "q41d", "q5", "q20", "q29", "q33"]] = ghana_pre[["q3", "q12", "q14", "q41d", "q5", "q20", "q29", "q33"]].replace(["Extremely important", "Exactly in Middle", "Extremely Unimportant", "Don't know"], [10, 5, 0, None]).replace(99, 5)
 ghana_post[["q3", "q12", "q14", "q41d", "q5", "q20", "q29", "q33"]] = ghana_post[["q3", "q12", "q14", "q41d", "q5", "q20", "q29", "q33"]].replace(["Extremely important", "Exactly in Middle", "Extremely Unimportant", "Don't know"], [10, 5, 0, None]).replace(99, 5)
 
 # food safety/ livelihood
 ghana_pre["qfood"] = (pd.to_numeric(ghana_pre["q3"]) + pd.to_numeric(ghana_pre["q12"]) + pd.to_numeric(ghana_pre["q14"])) / 3
-ghana_pre_qfood = ghana_pre.groupby("group", as_index = False)["qfood"].mean()
+ghana_pre_qfood = ghana_pre.groupby("groupnumber", as_index = False)["qfood"].mean()
 
 ghana_post["qfood"] = (pd.to_numeric(ghana_post["q3"]) + pd.to_numeric(ghana_post["q12"]) + pd.to_numeric(ghana_post["q14"])) / 3
-ghana_post_qfood = ghana_post.groupby("group", as_index = False)["qfood"].mean()
+ghana_post_qfood = ghana_post.groupby("groupnumber", as_index = False)["qfood"].mean()
 
-ghana_qfood_delta = pd.DataFrame({"group": ghana_post_qfood["group"], "delta": ghana_post_qfood["qfood"] - ghana_pre_qfood["qfood"]})
+ghana_qfood_delta = pd.DataFrame({"group": ghana_post_qfood["groupnumber"].astype(int).astype(str), "delta": ghana_post_qfood["qfood"] - ghana_pre_qfood["qfood"]})
 ghana_qfood_delta["id"] = "dp1_group" + ghana_qfood_delta["group"].astype(str) + "_session1"
 ghana_qfood_delta = ghana_qfood_delta.drop(["group"], axis = 1)
 
 # water policy
 ghana_pre["qwater"] = (pd.to_numeric(ghana_pre["q5"]) + pd.to_numeric(ghana_pre["q20"]) + pd.to_numeric(ghana_pre["q29"]) + pd.to_numeric(ghana_pre["q33"])) / 4
-ghana_pre_qwater = ghana_pre.groupby("group", as_index = False)["qwater"].mean()
+ghana_pre_qwater = ghana_pre.groupby("groupnumber", as_index = False)["qwater"].mean()
 
 ghana_post["qwater"] = (pd.to_numeric(ghana_post["q5"]) + pd.to_numeric(ghana_post["q20"]) + pd.to_numeric(ghana_post["q29"]) + pd.to_numeric(ghana_post["q33"])) / 4
-ghana_post_qwater = ghana_post.groupby("group", as_index = False)["qwater"].mean()
+ghana_post_qwater = ghana_post.groupby("groupnumber", as_index = False)["qwater"].mean()
 
-ghana_qwater_delta = pd.DataFrame({"group": ghana_post_qwater["group"], "delta": ghana_post_qwater["qwater"] - ghana_pre_qwater["qwater"]})
+ghana_qwater_delta = pd.DataFrame({"group": ghana_post_qwater["groupnumber"].astype(int).astype(str), "delta": ghana_post_qwater["qwater"] - ghana_pre_qwater["qwater"]})
 ghana_qwater_delta["id"] = "dp1_group" + ghana_qwater_delta["group"].astype(str) + "_session2"
 ghana_qwater_delta = ghana_qwater_delta.drop(["group"], axis = 1)
 
 ## Onto the Bududa
-bududa_and_butaleja = pd.read_excel("data/raw/surveys/uganda_Deliberative polling_Pre& Post Survey Data.xlsx")
+# also going to replace "99" (no response) with 5 (middle of the likert scale)
+# could do interpolation in the future
+bududa_and_butaleja = pd.read_excel("data/raw/surveys/uganda_Deliberative polling_Pre& Post Survey Data.xlsx").replace(99, 5)
 
-# going to add that random group for now, same as Ghana
-bududa_pre = bududa_and_butaleja[((bududa_and_butaleja["000ID"].str.contains("BUD")) & (bududa_and_butaleja["001_Poll"] == 1))]
-bududa_post = bududa_and_butaleja[((bududa_and_butaleja["000ID"].str.contains("BUD")) & (bududa_and_butaleja["001_Poll"] == 2))]
+# getting bududa groups
+bududa_groups = pd.read_csv("data/raw/surveys/bududa_groups.csv")
 
-bududa_pre["group"] = np.random.randint(1, 13, bududa_pre.shape[0])
-bududa_pre["group"] = bududa_pre["group"].replace([12], [14])
+# filtering to just the Bududa data, also joining on groups
+bududa_pre = bududa_and_butaleja[((bududa_and_butaleja["000ID"].str.contains("BUD")) & (bududa_and_butaleja["001_Poll"] == 1))].merge(bududa_groups, how = "left", left_on = "000ID", right_on = "id")
+bududa_post = bududa_and_butaleja[((bududa_and_butaleja["000ID"].str.contains("BUD")) & (bududa_and_butaleja["001_Poll"] == 2))].merge(bududa_groups, how = "left", left_on = "000ID", right_on = "id")
 
-bududa_post["group"] = np.random.randint(1, 13, bududa_post.shape[0])
-bududa_post["group"] = bududa_post["group"].replace([12], [14])
+# Land Management
+bududa_pre["land_management"] = bududa_pre[["114_Planttrees_protectriverbeds", "115_Riverchannels_localgovernment", "116_wetlands_dryseason", "117_Riceschemes_notinwetlands", "118_Communities_maintainwaterchannels", "119_Communities_benefitscropdiversity", "120_Communities_de-silting", "121_Government_assistdesilting", "122_Communities_sanitationdrains", "123_Government_drillingcleanwater", "124_Communities_resourcesaccesswater"]].sum(axis = 1) / 11
+
+bududa_post["land_management"] = bududa_post[["114_Planttrees_protectriverbeds", "115_Riverchannels_localgovernment", "116_wetlands_dryseason", "117_Riceschemes_notinwetlands", "118_Communities_maintainwaterchannels", "119_Communities_benefitscropdiversity", "120_Communities_de-silting", "121_Government_assistdesilting", "122_Communities_sanitationdrains", "123_Government_drillingcleanwater", "124_Communities_resourcesaccesswater"]].sum(axis = 1) / 11
+
+bududa_pre_lm = bududa_pre.groupby()
