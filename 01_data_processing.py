@@ -116,3 +116,48 @@ bududa_post_re = bududa_post.groupby("groupnumber", as_index = False)["resettlem
 bududa_re_delta = pd.DataFrame({"group": bududa_post_lm["groupnumber"].astype(int).astype(str), "delta": bududa_post_re["resettlement"] - bududa_pre_re["resettlement"]})
 bududa_re_delta["id"] = "dp2_group" + bududa_re_delta["group"] + "_session3"
 bududa_re_delta = bududa_re_delta.drop(["group"], axis = 1)
+
+## Onto the Butaleja
+
+# getting butaleja groups
+butaleja_groups = pd.read_csv("data/raw/surveys/butaleja_groups.csv")
+
+# filtering to just the Butaleja data, also joining on groups
+butaleja_pre = bududa_and_butaleja[((bududa_and_butaleja["000ID"].str.contains("BUT")) & (bududa_and_butaleja["001_Poll"] == 1))].merge(butaleja_groups, how = "left", left_on = "000ID", right_on = "id")
+butaleja_post = bududa_and_butaleja[((bududa_and_butaleja["000ID"].str.contains("BUT")) & (bududa_and_butaleja["001_Poll"] == 2))].merge(butaleja_groups, how = "left", left_on = "000ID", right_on = "id")
+
+# Land Management
+butaleja_pre["land_management"] = butaleja_pre[["114_Planttrees_protectriverbeds", "115_Riverchannels_localgovernment", "116_wetlands_dryseason", "117_Riceschemes_notinwetlands", "118_Communities_maintainwaterchannels", "119_Communities_benefitscropdiversity", "120_Communities_de-silting", "121_Government_assistdesilting", "122_Communities_sanitationdrains", "123_Government_drillingcleanwater", "124_Communities_resourcesaccesswater"]].sum(axis = 1) / 11
+
+butaleja_post["land_management"] = butaleja_post[["114_Planttrees_protectriverbeds", "115_Riverchannels_localgovernment", "116_wetlands_dryseason", "117_Riceschemes_notinwetlands", "118_Communities_maintainwaterchannels", "119_Communities_benefitscropdiversity", "120_Communities_de-silting", "121_Government_assistdesilting", "122_Communities_sanitationdrains", "123_Government_drillingcleanwater", "124_Communities_resourcesaccesswater"]].sum(axis = 1) / 11
+
+butaleja_pre_lm = butaleja_pre.groupby("groupnumber", as_index = False)["land_management"].mean()
+butaleja_post_lm = butaleja_post.groupby("groupnumber", as_index = False)["land_management"].mean()
+
+butaleja_lm_delta = pd.DataFrame({"group": butaleja_post_lm["groupnumber"].astype(int).astype(str), "delta": butaleja_post_lm["land_management"] - butaleja_pre_lm["land_management"]})
+butaleja_lm_delta["id"] = "dp3_group" + butaleja_lm_delta["group"] + "_session1"
+butaleja_lm_delta = butaleja_lm_delta.drop(["group"], axis = 1)
+
+# Population pressure
+butaleja_pre["population"] = butaleja_pre[["125_Buildroads_accessmarkets", "126_Government_morebridges", "127_Government_raisenarrowbridges", "128_Newbuildings_highfloors", "129_Communities_ladders", "130_Government_oneclassschools", "131_Commties_girlsandboys", "132_Commties_technicalschools", "133_Government_enforceminimumageof18", "134_Resources_planningsizeoffamilies", "135_Education_familyplanning", "136_HealthcenterIIs", "137_Moreroads_fewerbridges"]].sum(axis = 1) / 13
+
+butaleja_post["population"] = butaleja_post[["125_Buildroads_accessmarkets", "126_Government_morebridges", "127_Government_raisenarrowbridges", "128_Newbuildings_highfloors", "129_Communities_ladders", "130_Government_oneclassschools", "131_Commties_girlsandboys", "132_Commties_technicalschools", "133_Government_enforceminimumageof18", "134_Resources_planningsizeoffamilies", "135_Education_familyplanning", "136_HealthcenterIIs", "137_Moreroads_fewerbridges"]].sum(axis = 1) / 13
+
+butaleja_pre_pp = butaleja_pre.groupby("groupnumber", as_index = False)["population"].mean()
+butaleja_post_pp = butaleja_post.groupby("groupnumber", as_index = False)["population"].mean()
+
+butaleja_pp_delta = pd.DataFrame({"group": butaleja_post_lm["groupnumber"].astype(int).astype(str), "delta": butaleja_post_pp["population"] - butaleja_pre_pp["population"]})
+butaleja_pp_delta["id"] = "dp3_group" + butaleja_pp_delta["group"] + "_session2"
+butaleja_pp_delta = butaleja_pp_delta.drop(["group"], axis = 1)
+
+# Resettlement
+butaleja_pre["resettlement"] = butaleja_pre[["101_Rezoning", "102_Compesation", "103_Resettle_hostfamilies", "104_support_hostfamilies", "105_Strengthen_DMCs", "106_Raisefunds_DMCs", "107_Training_DMCs", "108_Buildperi-urbancenterrs", "109_Newperi-urbancenters_nearby"]].sum(axis = 1) / 9
+
+butaleja_post["resettlement"] = butaleja_post[["101_Rezoning", "102_Compesation", "103_Resettle_hostfamilies", "104_support_hostfamilies", "105_Strengthen_DMCs", "106_Raisefunds_DMCs", "107_Training_DMCs", "108_Buildperi-urbancenterrs", "109_Newperi-urbancenters_nearby"]].sum(axis = 1) / 9
+
+butaleja_pre_re = butaleja_pre.groupby("groupnumber", as_index = False)["resettlement"].mean()
+butaleja_post_re = butaleja_post.groupby("groupnumber", as_index = False)["resettlement"].mean()
+
+butaleja_re_delta = pd.DataFrame({"group": butaleja_post_lm["groupnumber"].astype(int).astype(str), "delta": butaleja_post_re["resettlement"] - butaleja_pre_re["resettlement"]})
+butaleja_re_delta["id"] = "dp3_group" + butaleja_re_delta["group"] + "_session3"
+butaleja_re_delta = butaleja_re_delta.drop(["group"], axis = 1)
