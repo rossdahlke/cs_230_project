@@ -86,4 +86,33 @@ bududa_pre["land_management"] = bududa_pre[["114_Planttrees_protectriverbeds", "
 
 bududa_post["land_management"] = bududa_post[["114_Planttrees_protectriverbeds", "115_Riverchannels_localgovernment", "116_wetlands_dryseason", "117_Riceschemes_notinwetlands", "118_Communities_maintainwaterchannels", "119_Communities_benefitscropdiversity", "120_Communities_de-silting", "121_Government_assistdesilting", "122_Communities_sanitationdrains", "123_Government_drillingcleanwater", "124_Communities_resourcesaccesswater"]].sum(axis = 1) / 11
 
-bududa_pre_lm = bududa_pre.groupby()
+bududa_pre_lm = bududa_pre.groupby("groupnumber", as_index = False)["land_management"].mean()
+bududa_post_lm = bududa_post.groupby("groupnumber", as_index = False)["land_management"].mean()
+
+bududa_lm_delta = pd.DataFrame({"group": bududa_post_lm["groupnumber"].astype(int).astype(str), "delta": bududa_post_lm["land_management"] - bududa_pre_lm["land_management"]})
+bududa_lm_delta["id"] = "dp2_group" + bududa_lm_delta["group"] + "_session1"
+bududa_lm_delta = bududa_lm_delta.drop(["group"], axis = 1)
+
+# Population pressure
+bududa_pre["population"] = bududa_pre[["125_Buildroads_accessmarkets", "126_Government_morebridges", "127_Government_raisenarrowbridges", "128_Newbuildings_highfloors", "129_Communities_ladders", "130_Government_oneclassschools", "131_Commties_girlsandboys", "132_Commties_technicalschools", "133_Government_enforceminimumageof18", "134_Resources_planningsizeoffamilies", "135_Education_familyplanning", "136_HealthcenterIIs", "137_Moreroads_fewerbridges"]].sum(axis = 1) / 13
+
+bududa_post["population"] = bududa_post[["125_Buildroads_accessmarkets", "126_Government_morebridges", "127_Government_raisenarrowbridges", "128_Newbuildings_highfloors", "129_Communities_ladders", "130_Government_oneclassschools", "131_Commties_girlsandboys", "132_Commties_technicalschools", "133_Government_enforceminimumageof18", "134_Resources_planningsizeoffamilies", "135_Education_familyplanning", "136_HealthcenterIIs", "137_Moreroads_fewerbridges"]].sum(axis = 1) / 13
+
+bududa_pre_pp = bududa_pre.groupby("groupnumber", as_index = False)["population"].mean()
+bududa_post_pp = bududa_post.groupby("groupnumber", as_index = False)["population"].mean()
+
+bududa_pp_delta = pd.DataFrame({"group": bududa_post_lm["groupnumber"].astype(int).astype(str), "delta": bududa_post_pp["population"] - bududa_pre_pp["population"]})
+bududa_pp_delta["id"] = "dp2_group" + bududa_pp_delta["group"] + "_session2"
+bududa_pp_delta = bududa_pp_delta.drop(["group"], axis = 1)
+
+# Resettlement
+bududa_pre["resettlement"] = bududa_pre[["101_Rezoning", "102_Compesation", "103_Resettle_hostfamilies", "104_support_hostfamilies", "105_Strengthen_DMCs", "106_Raisefunds_DMCs", "107_Training_DMCs", "108_Buildperi-urbancenterrs", "109_Newperi-urbancenters_nearby"]].sum(axis = 1) / 9
+
+bududa_post["resettlement"] = bududa_post[["101_Rezoning", "102_Compesation", "103_Resettle_hostfamilies", "104_support_hostfamilies", "105_Strengthen_DMCs", "106_Raisefunds_DMCs", "107_Training_DMCs", "108_Buildperi-urbancenterrs", "109_Newperi-urbancenters_nearby"]].sum(axis = 1) / 9
+
+bududa_pre_re = bududa_pre.groupby("groupnumber", as_index = False)["resettlement"].mean()
+bududa_post_re = bududa_post.groupby("groupnumber", as_index = False)["resettlement"].mean()
+
+bududa_re_delta = pd.DataFrame({"group": bududa_post_lm["groupnumber"].astype(int).astype(str), "delta": bududa_post_re["resettlement"] - bududa_pre_re["resettlement"]})
+bududa_re_delta["id"] = "dp2_group" + bududa_re_delta["group"] + "_session3"
+bududa_re_delta = bududa_re_delta.drop(["group"], axis = 1)
