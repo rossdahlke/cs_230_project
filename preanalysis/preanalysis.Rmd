@@ -165,7 +165,7 @@ ghana_deltas %>%
   theme(legend.position = "none")
 ```
 
-## Bududa
+# Bududa
 
 ```{r}
 bududa_groups <- foreign::read.dta("../data/raw/surveys/BUD data with group numbers.dta") %>% 
