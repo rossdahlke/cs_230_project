@@ -161,3 +161,8 @@ butaleja_post_re = butaleja_post.groupby("groupnumber", as_index = False)["reset
 butaleja_re_delta = pd.DataFrame({"group": butaleja_post_lm["groupnumber"].astype(int).astype(str), "delta": butaleja_post_re["resettlement"] - butaleja_pre_re["resettlement"]})
 butaleja_re_delta["id"] = "dp3_group" + butaleja_re_delta["group"] + "_session3"
 butaleja_re_delta = butaleja_re_delta.drop(["group"], axis = 1)
+
+### Merge deltas
+all_deltas = ghana_qfood_delta.append(ghana_qwater_delta).append(bududa_lm_delta).append(bududa_pp_delta).append(bududa_re_delta).append(butaleja_lm_delta).append(butaleja_pp_delta).append(butaleja_re_delta)
+
+all_deltas.to_csv("data/processed/survey/opinion_deltas.csv")
