@@ -76,7 +76,6 @@ def rename_transcript(old_file):
 
     return new_file
 
-counter = 0
 for x in transcripts:
     new_file = rename_transcript(x)
     os.rename(r"data/raw/transcripts/"+x, r"data/processed/transcripts/"+new_file)
