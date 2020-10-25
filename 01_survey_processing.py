@@ -11,9 +11,8 @@
 # Since there are only 3 datasets, and each is formatting uniquely, I will work with each dataset individually instead of functionalizing
 # Funcationalization could be done if more Deliberative Polls are conducted and data is publicly released
 
-# There are two main processing tasks:
+# Main task for this document:
 # 1. Processing survey results to calcualte deltas in opinions
-# 2. Text pre-processing on the transcripts
 
 # There are multiple different Deliberative Polls, each with about 15 groups which conduct 2-3 different sessions
 # To standardize the data, I will labels transcripts and survey results as:
