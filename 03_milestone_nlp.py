@@ -338,3 +338,20 @@ for epoch in range(1, n_epochs + 1):
             break
 
 print('Done!')
+
+def smooth(y, box_pts):
+    box = np.ones(box_pts)/box_pts
+    y_smooth = np.convolve(y, box, mode='same')
+    return y_smooth
+
+f, ax = plt.subplots(1, 2, figsize=(12, 4))
+
+ax[0].plot(loss_history, label='loss')
+ax[0].set_title('Validation Loss History')
+ax[0].set_xlabel('Epoch no.')
+ax[0].set_ylabel('Loss')
+
+ax[1].plot(smooth(acc_history, 5)[:-2], label='acc')
+ax[1].set_title('Validation Accuracy History')
+ax[1].set_xlabel('Epoch no.')
+ax[1].set_ylabel('Accuracy');
