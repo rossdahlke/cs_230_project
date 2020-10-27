@@ -32,7 +32,6 @@ from scipy import stats
 deltas = pd.read_csv("data/processed/survey/opinion_deltas.csv")
 similarity_list = []
 delta_list = []
-id = deltas["id"][0]
 for id in deltas["id"]:
     n_breaks = 10
     try:
@@ -82,5 +81,32 @@ slope, intercept, r_value, p_value, std_err = stats.linregress(similarity_list, 
 slope
 p_value
 
-## baseline NN
-# using this tutorial https://www.kaggle.com/purplejester/a-simple-lstm-based-time-series-classifier
+## RNN with sentiment
+# sentiment analysis based off: https://medium.com/@b.terryjack/nlp-pre-trained-sentiment-analysis-1eb52a9d742c
+from textblob import TextBlob
+
+polarity_list = []
+subjectivity_list = []
+delta_list = []
+for id in deltas["id"]:
+    polarities = []
+    subjectivities = []
+    try:
+        doc = docx.Document("data/processed/transcripts/" + id + ".docx")
+        paragraphs = [p.text for p in doc.paragraphs][:-10]
+        for paragraph in paragraphs:
+            polarity = TextBlob(paragraph).sentiment[0]
+            polarities.append(polarity)
+            subjectivity = TextBlob(paragraph).sentiment[1]
+            subjectivities.append(subjectivity)
+        polarity_list.append(polarities)
+        subjectivity_list.append(subjectivities)
+        delta = abs(deltas[deltas["id"] == id]["delta"].values[0])
+        delta_list.append(delta)
+    except Exception:
+        print("passed on " + id + ". No transcript.")
+        pass
+
+
+
+## LSTM on text
