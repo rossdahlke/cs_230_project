@@ -23,7 +23,12 @@ nlp = spacy.load("en_core_web_lg")
 import docx
 import pandas as pd
 import numpy as np
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+import matplotlib.pyplot as plt
+from scipy import stats
 
+# similarities
 deltas = pd.read_csv("data/processed/survey/opinion_deltas.csv")
 similarity_list = []
 delta_list = []
@@ -49,25 +54,33 @@ for id in deltas["id"]:
         print("passed on " + id + ". No transcript.")
         pass
 
+# linear regression
+similarity_train = np.reshape(np.asarray(similarity_list[0:90]), (-1, 1))
+similarity_test = np.reshape(np.asarray(similarity_list[91:101]), (-1, 1))
 
+delta_train = np.reshape(np.asarray(delta_list[0:90]), (-1, 1))
+delta_test = np.reshape(np.asarray(delta_list[91:101]), (-1, 1))
+
+model = LinearRegression()
+
+model.fit(similarity_train, delta_train)
+
+delta_test_pred = model.predict(similarity_test)
+
+model.coef_
+
+mean_squared_error(delta_test, delta_test_pred)
+
+r2_score(delta_test, delta_test_pred)
+
+plt.scatter(similarity_test, delta_test, color = "black")
+plt.plot(similarity_test, delta_test_pred, color = "blue", linewidth = 3)
+plt.show()
+
+slope, intercept, r_value, p_value, std_err = stats.linregress(similarity_list, delta_list)
+
+slope
+p_value
 
 ## baseline NN
 # using this tutorial https://www.kaggle.com/purplejester/a-simple-lstm-based-time-series-classifier
-import matplotlib.pyplot as plt
-import numpy as np
-import pandas as pd
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import LabelEncoder
-import torch
-from torch import nn
-from torch.nn import functional as F
-from torch.utils.data import TensorDataset, DataLoader
-from torch.optim.lr_scheduler import _LRScheduler
-from torch.nn.utils.rnn import pad_sequence, pack_padded_sequence, pad_packed_sequence
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-
-similarity_tensors = []
-for i in range(len(similarity_list)):
-    similarity_tensors.append(torch.tensor(similarity_list[i]))
-
-similarity_tensors_padded = pad_sequence(similarity_tensors)
