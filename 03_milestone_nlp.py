@@ -107,6 +107,77 @@ for id in deltas["id"]:
         print("passed on " + id + ". No transcript.")
         pass
 
+# RNN https://www.kaggle.com/purplejester/pytorch-deep-time-series-classification
+from collections import defaultdict
+from functools import partial
+from multiprocessing import cpu_count
+from pathlib import Path
+from textwrap import dedent
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+from sklearn.externals import joblib
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder, StandardScaler
+import torch
+from torch import nn
+from torch import optim
+from torch.nn import functional as F
+from torch.optim.lr_scheduler import _LRScheduler
+from torch.utils.data import TensorDataset, DataLoader
+
+seed = 1
+np.random.seed(seed)
+
+# can do some preprocessing in the future, but it shouldn't be too bad given range from the sentiment models
+
+polarity_list_padded = []
+for list in polarity_list:
+    to_pad = max - len(list)
+    polarity_list_padded.append(np.pad(list, (to_pad, 0)))
+polarity_array = np.asarray(polarity_list_padded)
+
+subjectivity_list_padded = []
+for list in subjectivity_list:
+    to_pad = max - len(list)
+    subjectivity_list_padded.append(np.pad(list, (to_pad, 0)))
+subjectivity_array = np.asarray(subjectivity_list_padded)
+
+delta_array = np.asarray(delta_list)
+
+def create_datasets(data, target, train_size, valid_pct=0.1, seed=None):
+    """Converts NumPy arrays into PyTorch datsets.
+
+    Three datasets are created in total:
+        * training dataset
+        * validation dataset
+        * testing (un-labelled) dataset
+
+    """
+    sz = train_size
+    idx = np.arange(sz)
+    trn_idx, val_idx = train_test_split(
+        idx, test_size=valid_pct, random_state=seed)
+    trn_ds = TensorDataset(
+        torch.tensor(data[:sz][trn_idx]),
+        torch.tensor(target[:sz][trn_idx]).long())
+    val_ds = TensorDataset(
+        torch.tensor(data[:sz][val_idx]),
+        torch.tensor(target[:sz][val_idx]).long())
+    tst_ds = TensorDataset(
+        torch.tensor(data[sz:]),
+        torch.tensor(target[sz:]).long())
+    return trn_ds, val_ds, tst_ds
+
+
+
+
+
+
+
+
+
+
 
 
 ## LSTM on text
