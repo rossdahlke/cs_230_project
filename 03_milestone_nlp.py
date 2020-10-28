@@ -152,7 +152,7 @@ delta_array = np.asarray(delta_list).reshape(-1, 1)[:, :, np.newaxis]
 np.shape(delta_array)
 np.shape(subjectivity_array)
 np.shape(polarity_array)
-trn_ds
+
 def create_datasets(polarity_array, subjectivity_array, delta_array, train_size = 80, valid_pct=0.1, seed=None):
     """Converts NumPy arrays into PyTorch datsets.
 
@@ -276,10 +276,10 @@ device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
 datasets = create_datasets(polarity_array, subjectivity_array, delta_array)
 
-trn_dl, val_dl, tst_dl = create_loaders(datasets, bs = 101)
+trn_dl, val_dl, tst_dl = create_loaders(datasets, bs = 40)
 
 lr = 0.001
-n_epochs = 3000
+n_epochs = 500
 iterations_per_epoch = len(trn_dl)
 num_classes = 2
 best_mse = 10
@@ -354,11 +354,3 @@ ax[1].plot(smooth(mse_history, 5)[:-2], label='mse')
 ax[1].set_title('Validation MSE History')
 ax[1].set_xlabel('Epoch no.')
 ax[1].set_ylabel('MSE');
-
-polarity_tensor = torch.tensor(polarity_array).float()
-subjectivity_tensor = torch.tensor(subjectivity_array).float()
-delta_tensor = torch.tensor(delta_array).float()
-
-out = model(polarity_tensor, subjectivity_tensor)
-mse = criterion(out, delta_tensor)
-np.mean(delta_array)
