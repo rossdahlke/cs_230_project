@@ -120,6 +120,7 @@ from sklearn.externals import joblib
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder, StandardScaler
 import torch
+print(torch.__version__)
 from torch import nn
 from torch import optim
 from torch.nn import functional as F
@@ -146,13 +147,13 @@ for list in subjectivity_list:
 subjectivity_array = np.asarray(subjectivity_list_padded)[:, :, np.newaxis]
 subjectivity_feat = subjectivity_array.shape[1]
 
-delta_array = np.asarray(delta_list)
+delta_array = np.asarray(delta_list).reshape(-1, 1)[:, :, np.newaxis]
 
 np.shape(delta_array)
 np.shape(subjectivity_array)
 np.shape(polarity_array)
-
-def create_datasets(polarity_array, subjectivity_array, target, train_size = 80, valid_pct=0.1, seed=None):
+trn_ds
+def create_datasets(polarity_array, subjectivity_array, delta_array, train_size = 80, valid_pct=0.1, seed=None):
     """Converts NumPy arrays into PyTorch datsets.
 
     Three datasets are created in total:
@@ -163,6 +164,7 @@ def create_datasets(polarity_array, subjectivity_array, target, train_size = 80,
     """
     raw = polarity_array
     fft = subjectivity_array
+    target = delta_array
     sz = train_size
     idx = np.arange(sz)
     trn_idx, val_idx = train_test_split(
@@ -170,18 +172,18 @@ def create_datasets(polarity_array, subjectivity_array, target, train_size = 80,
     trn_ds = TensorDataset(
         torch.tensor(raw[:sz][trn_idx]).float(),
         torch.tensor(fft[:sz][trn_idx]).float(),
-        torch.tensor(target[:sz][trn_idx]).long())
+        torch.tensor(target[:sz][trn_idx]).float())
     val_ds = TensorDataset(
         torch.tensor(raw[:sz][val_idx]).float(),
         torch.tensor(fft[:sz][val_idx]).float(),
-        torch.tensor(target[:sz][val_idx]).long())
+        torch.tensor(target[:sz][val_idx]).float())
     tst_ds = TensorDataset(
         torch.tensor(raw[sz:]).float(),
         torch.tensor(fft[sz:]).float(),
-        torch.tensor(target[sz:]).long())
+        torch.tensor(target[sz:]).float())
     return trn_ds, val_ds, tst_ds
 
-def create_loaders(data, bs=10, jobs=0):
+def create_loaders(data, bs=80, jobs=0):
     """Wraps the datasets returned by create_datasets function with data loaders."""
 
     trn_ds, val_ds, tst_ds = data
@@ -274,22 +276,22 @@ device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
 datasets = create_datasets(polarity_array, subjectivity_array, delta_array)
 
-trn_dl, val_dl, tst_dl = create_loaders(datasets)
+trn_dl, val_dl, tst_dl = create_loaders(datasets, bs = 101)
 
 lr = 0.001
 n_epochs = 3000
 iterations_per_epoch = len(trn_dl)
 num_classes = 2
-best_acc = 0
+best_mse = 10
 patience, trials = 500, 0
 base = 1
 step = 2
 trn_sz = 80
 loss_history = []
-acc_history = []
+mse_history = []
 
 model = Classifier(polarity_feat, subjectivity_feat, num_classes).to(device)
-criterion = nn.CrossEntropyLoss(reduction='sum')
+criterion = nn.MSELoss()
 opt = optim.Adam(model.parameters(), lr=lr)
 
 print('Start model training')
@@ -311,26 +313,23 @@ for epoch in range(1, n_epochs + 1):
     loss_history.append(epoch_loss)
 
     model.eval()
-    correct, total = 0, 0
+    total_mse = 0
     for batch in val_dl:
         x_raw, x_fft, y_batch = [t.to(device) for t in batch]
         out = model(x_raw, x_fft)
-        preds = F.log_softmax(out, dim=1).argmax(dim=1)
-        total += y_batch.size(0)
-        correct += (preds == y_batch).sum().item()
+        mse = criterion(out, y_batch)
 
-    acc = correct / total
-    acc_history.append(acc)
+    mse_history.append(mse)
 
     if epoch % base == 0:
-        print(f'Epoch: {epoch:3d}. Loss: {epoch_loss:.4f}. Acc.: {acc:2.2%}')
+        print(f'Epoch: {epoch:3d}. Loss: {epoch_loss:.4f}. MSE.: {mse:2.2%}')
         base *= step
 
-    if acc > best_acc:
+    if mse < best_mse:
         trials = 0
-        best_acc = acc
+        best_mse = mse
         torch.save(model.state_dict(), 'best.pth')
-        print(f'Epoch {epoch} best model saved with accuracy: {best_acc:2.2%}')
+        # print(f'Epoch {epoch} best model saved with mse: {best_mse:2.2%}')
     else:
         trials += 1
         if trials >= patience:
@@ -351,7 +350,15 @@ ax[0].set_title('Validation Loss History')
 ax[0].set_xlabel('Epoch no.')
 ax[0].set_ylabel('Loss')
 
-ax[1].plot(smooth(acc_history, 5)[:-2], label='acc')
-ax[1].set_title('Validation Accuracy History')
+ax[1].plot(smooth(mse_history, 5)[:-2], label='mse')
+ax[1].set_title('Validation MSE History')
 ax[1].set_xlabel('Epoch no.')
-ax[1].set_ylabel('Accuracy');
+ax[1].set_ylabel('MSE');
+
+polarity_tensor = torch.tensor(polarity_array).float()
+subjectivity_tensor = torch.tensor(subjectivity_array).float()
+delta_tensor = torch.tensor(delta_array).float()
+
+out = model(polarity_tensor, subjectivity_tensor)
+mse = criterion(out, delta_tensor)
+np.mean(delta_array)
