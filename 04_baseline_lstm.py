@@ -18,7 +18,7 @@ from collections import Counter
 deltas = pd.read_csv("data/processed/survey/opinion_deltas.csv")
 doc_list = []
 delta_list = []
-for id in deltas["id"][1:10]:
+for id in deltas["id"][1:20]:
     try:
         doc = docx2txt.process("data/processed/transcripts/" + id + ".docx").replace("\n", " ").lower()
         doc_list.append(doc)
@@ -151,7 +151,7 @@ class SpamHamLSTM(nn.Module):
 
         # linear and sigmoid layers
         self.fc = nn.Linear(hidden_dim, output_size)
-        self.sig = nn.Sigmoid()
+        # self.sig = nn.Sigmoid()
 
 
     def forward(self, x, seq_lengths):
@@ -179,7 +179,7 @@ class SpamHamLSTM(nn.Module):
         output = self.fc(output).squeeze()
 
         # sigmoid function
-        output = self.sig(output)
+        # output = self.sig(output)
 
         return output
 
@@ -208,7 +208,7 @@ net = net.to(device)
 print(net)
 
 # loss and optimization functions
-criterion = nn.BCELoss()
+criterion = nn.MSELoss()
 
 lr=0.03
 optimizer = torch.optim.Adam(net.parameters(), lr=lr)
@@ -218,7 +218,7 @@ scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer,\
                                                       factor = 0.5,\
                                                       patience = 2)
 
-epochs = 6
+epochs = 20
 
 counter = 0
 print_every = 1
@@ -233,6 +233,7 @@ for e in range(epochs):
     scheduler.step(e)
 
     for seq_tensor, seq_tensor_lengths, label in iter(train_loader):
+
         counter += 1
 
         seq_tensor = seq_tensor.to(device)
@@ -272,17 +273,29 @@ for e in range(epochs):
                 val_loss = criterion(output, label.float())
                 val_losses_in_itr.append(val_loss.item())
 
-                # accuracy
-                binary_output = (output >= 0.5).short() # short(): torch.int16
-                right_or_not = torch.eq(binary_output, label)
-                sums.append(torch.sum(right_or_not).float().item())
-                sizes.append(right_or_not.shape[0])
-
-            accuracy = sum(sums) / sum(sizes)
-
             net.train()
             print("Epoch: {:2d}/{:2d}\t".format(e+1, epochs),
                   "Steps: {:3d}\t".format(counter),
                   "Loss: {:.6f}\t".format(loss.item()),
-                  "Val Loss: {:.6f}\t".format(np.mean(val_losses_in_itr)),
-                  "Accuracy: {:.3f}".format(accuracy))
+                  "Val Loss: {:.6f}\t".format(np.mean(val_losses_in_itr)))
+
+test_losses = []
+sums = []
+sizes = []
+
+net.eval()
+
+test_losses = []
+for seq_tensor, seq_tensor_lengths, label in iter(test_loader):
+
+    seq_tensor = seq_tensor.to(device)
+    seq_tensor_lengths = seq_tensor_lengths.to(device)
+    label = torch.tensor(label).to(device)
+    output = net(seq_tensor, seq_tensor_lengths)
+
+    # losses
+    test_loss = criterion(output, label.float())
+    test_losses.append(test_loss.item())
+
+accuracy = np.sum(sums) / np.sum(sizes)
+print("Test Loss: {:.6f}\t".format(np.mean(test_losses)))

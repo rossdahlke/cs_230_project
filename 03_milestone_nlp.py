@@ -271,7 +271,7 @@ class Classifier(nn.Module):
         out = self.out(t_in)
         return out
 
-# polarity
+# model
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
 datasets = create_datasets(polarity_array, subjectivity_array, delta_array)
@@ -281,7 +281,7 @@ trn_dl, val_dl, tst_dl = create_loaders(datasets, bs = 40)
 lr = 0.001
 n_epochs = 500
 iterations_per_epoch = len(trn_dl)
-num_classes = 2
+num_classes = 9
 best_mse = 10
 patience, trials = 500, 0
 base = 1
