@@ -18,7 +18,7 @@ from collections import Counter
 deltas = pd.read_csv("data/processed/survey/opinion_deltas.csv")
 doc_list = []
 delta_list = []
-for id in deltas["id"][1:20]:
+for id in deltas["id"]:
     try:
         doc = docx2txt.process("data/processed/transcripts/" + id + ".docx").replace("\n", " ").lower()
         doc_list.append(doc)
@@ -218,10 +218,10 @@ scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer,\
                                                       factor = 0.5,\
                                                       patience = 2)
 
-epochs = 20
+epochs = 1000
 
 counter = 0
-print_every = 1
+print_every = 100
 clip=5 # gradient clipping
 
 
@@ -280,8 +280,6 @@ for e in range(epochs):
                   "Val Loss: {:.6f}\t".format(np.mean(val_losses_in_itr)))
 
 test_losses = []
-sums = []
-sizes = []
 
 net.eval()
 
@@ -297,5 +295,4 @@ for seq_tensor, seq_tensor_lengths, label in iter(test_loader):
     test_loss = criterion(output, label.float())
     test_losses.append(test_loss.item())
 
-accuracy = np.sum(sums) / np.sum(sizes)
 print("Test Loss: {:.6f}\t".format(np.mean(test_losses)))
