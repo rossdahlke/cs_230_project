@@ -26,15 +26,15 @@ knitr::opts_chunk$set(echo = F, warning = F, message = F)
 library(tidyverse)
 ```
 
-# The main purpose of this document is to analyze the results of the DPs in order to determine which questions should be used in the analysis.
+The main purpose of this document is to analyze the results of the DPs in order to determine which questions should be used in the analysis.
 
 I will calculate on which issues opinions change the most, or if I can even use an average of all of the questions.
 
-## Ghana
+# Ghana
 
 ```{r}
 ghana_groups <- read_csv("../data/raw/surveys/ghana-mergedataset.csv") %>% 
-  select(namerespon, formnumber, groupnumber)
+  select(namerespo, formnumber, groupnumber)
 
 ghana_pre <- read_csv("../data/raw/surveys/ghana-presurvey.csv") %>% 
   mutate_at(vars(starts_with("q")), ~str_replace(., "Extremely important", "10")) %>% 

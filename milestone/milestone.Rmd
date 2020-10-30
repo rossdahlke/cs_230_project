@@ -1,0 +1,47 @@
+---
+output:
+  pdf_document:
+    # citation_package: biblatex
+    keep_tex: true
+    fig_caption: true
+    latex_engine: pdflatex
+    template: ../svm-latex-ms.tex
+title: "Predicting Opinion Change in Deliberative Groups (Natural Language Processing)"
+thanks: "Code and data available at: github.com/rossdahlke/cs_230_project"
+author:
+- name: Ross Dahlke (rdahlke@stanford.edu)
+affiliation: Stanford University
+abstract: ""
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+geometry: margin=1in
+fontfamily: mathpazo
+fontsize: 11pt
+spacing: single
+bibliography: ../milestone/bibliography.bib
+biblio-style: apsr
+---
+
+# 1. Introduction
+
+Deliberative Democracy is when a representative sample of people come together for a short period of time to discuss civic issues. The idea is that through a deliberative process, where people are access to objective information and good conditions to discuss, people can come to conclusions on civic issues that are most representative of what people actually want [cite Fishkin book]. In a time where so much discussion about political and civic issues happens in online information bubbles, Deliberative Democracy offers a chance for people to discuss issues on their merit and the freedom to change their opinions in order to reveal a better representation of public opinion. 
+
+Deliberative Democracy Polling is a technique pioneered by Stanford University Professor Jim Fishkin and the Center for Deliberative Democracy (CDD). A Deliberative Poll is where individuals are polled on their opinions before and after a weekend of small-group deliberation. This method allows researchers to measure the change in people's opinions as a result of the deliberative sessions. 
+
+This project uses the results of surveys and transcripts from the CDD's Deliberative Polls to predict group opinion change based on the transcripts from the groups' deliberative sessions. In talking with members of the CDD, they theorized that computational approaches to predicting opinion change might be difficult because of the narrow focus of each of the deliberative sessions. For example, one whole session might be devoted to discussing water policy. And so, water is the main topic of discussion the entire time. Folks from the CDD have also concluded that participants often don't explicitly say that they have changed their opinion on the topic of the deliberative session, even if they reveal a change in opinion in the survey. Given this prior information, I will work on building a model to predict opinion change in two steps:
+
+  1. (For this milestone) Experimenting with predicting opinion change based on the words and text of the deliberative sessions.
+  2. (For the final submission) Experimenting with predicting opinion change by incorporating linguistic features
+  
+Based on previous discussions with members of the CDC, I will first try to find a baseline model based on the text found in the transcripts. For the final project I will try to incorporate linguistic features into the models. Incorporating linguistic features will be a key component of this project because I hypothesize that it is not _what_ people talk about in the deliberative sessions, it is _how_ they talk about the issues. For example, how subjective or objective are the statements people are making in the deliberative setting, or how are sentences structured in groups that show opinion change versus don't show opinion change?
+  
+# 2. Related work
+
+# 3. Dataset and Features
+
+# 4. Methods
+
+# 5. Experiments/ Results/ Discussion
+
+# 6. Next Steps
+
+# References
