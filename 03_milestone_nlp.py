@@ -135,9 +135,9 @@ class SimpleNet(nn.Module):
     # Initialize the layers
     def __init__(self):
         super().__init__()
-        self.linear1 = nn.Linear(45, 20)
+        self.linear1 = nn.Linear(45, 10)
         self.act1 = nn.ReLU() # Activation function
-        self.linear2 = nn.Linear(20, 1)
+        self.linear2 = nn.Linear(10, 1)
 
     # Perform the computation
     def forward(self, x):
@@ -155,10 +155,12 @@ def fit(num_epochs, model, loss_fn, opt, print_every):
     counter = 0
     for epoch in range(num_epochs):
         counter += 1
+        train_losses_in_itr = []
         for xb, yb in train_dl:
             # Generate predictions
             pred = model(xb.float())
             loss = criterion(pred.float(), yb.float())
+            train_losses_in_itr.append(loss.item())
             # Perform gradient descent
             loss.backward()
             opt.step()
@@ -177,7 +179,7 @@ def fit(num_epochs, model, loss_fn, opt, print_every):
                 val_losses_in_itr.append(val_loss.item())
 
             print("Epoch: {:2d}/{:2d}\t".format(epoch+1, num_epochs),
-                  "Train Loss: {:.6f}\t".format(loss.item()),
+                  "Train Loss: {:.6f}\t".format(np.mean(train_losses_in_itr)),
                   "Val Loss: {:.6f}\t".format(np.mean(val_losses_in_itr)))
 
 fit(3000, model, criterion, opt, print_every = 100)
