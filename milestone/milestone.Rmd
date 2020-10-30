@@ -32,9 +32,11 @@ This project uses the results of surveys and transcripts from the CDD's Delibera
   1. (For this milestone) Experimenting with predicting opinion change based on the words and text of the deliberative sessions.
   2. (For the final submission) Experimenting with predicting opinion change by incorporating linguistic features
   
-Based on previous discussions with members of the CDC, I will first try to find a baseline model based on the text found in the transcripts. For the final project I will try to incorporate linguistic features into the models. Incorporating linguistic features will be a key component of this project because I hypothesize that it is not _what_ people talk about in the deliberative sessions, it is _how_ they talk about the issues. For example, how subjective or objective are the statements people are making in the deliberative setting, or how are sentences structured in groups that show opinion change versus don't show opinion change?
+Based on previous discussions with members of the CDC, I will first try to find a baseline model based on the text found in the transcripts. For the final project I will try to incorporate linguistic features into the models. Incorporating linguistic features will be a key component of this project because I hypothesize that it is not _what_ people talk about in the deliberative sessions, it is _how_ they talk about the issues that indicates opinion change. For example, how subjective or objective are the statements people are making in the deliberative setting, or how are sentences structured in groups that show opinion change versus don't show opinion change?
   
 # 2. Related work
+
+This project derives its inspiration from two main previous papers: "Attitude Change on Reddit's Change My View" [@cmv] and "A Deep-Learning Approach for Identifying Collective Action Events with Text and Image Data from Social Media" [@zhang]. The former paper found that the "the amount of evidence provided in a discussion predicts attitude change" on the Change My View Reddit forum. The latter paper was able to identify and collective action events in China based on image and text data and provides inspiration on using text data to identify collective behavior that has real-world application and can be a component of future computational social science research. 
 
 # 3. Dataset and Features
 
