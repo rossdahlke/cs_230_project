@@ -52,4 +52,6 @@ In addition to this approach of using word embeddings, I also build a baseline m
 
 # 6. Next Steps
 
+These basic models provide a good baseline estimate of how well one can predict opinion change based on the words that people use in deliberations. My next steps are to incorporate linguistic features. I plan to incorporate the findings of the Priniski and Horne paper that the amount of evidence provided in discussions predicts opinion change. I also examine the preditive ability of polarity and subjectivity of statements in the transcripts. One limitation of this project is the relatively small number of training examples available. And so, I will also leverage transformers to see if they provide the ability to better predict opinion change.
+
 # References
