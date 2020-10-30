@@ -47,14 +47,15 @@ for id in deltas["id"]:
     n_chunks = 10
     try:
         doc = docx.Document("data/processed/transcripts/" + id + ".docx")
-        paragraphs = [nlp(p.text) for p in doc.paragraphs]
+        paragraphs = [p.text for p in doc.paragraphs][:-10]
         chunks = list(divide_chunks(paragraphs, n_chunks))
         expanded_grid = expand_grid({"text_0": range(0, 10),
                                     "text_1": range(0, 10)})
-
         similarities = []
         for i in range(0, len(expanded_grid)):
-            similarities.append(paragraphs[expanded_grid["text_0"][i]].similarity(paragraphs[expanded_grid["text_1"][i]]))
+            text_0 = nlp(''.join(map(str, chunks[expanded_grid["text_0"][i]])))
+            text_1 = nlp(''.join(map(str, chunks[expanded_grid["text_1"][i]])))
+            similarities.append(text_0.similarity(text_1))
         expanded_grid["similarity"] = similarities
         expanded_grid["comparison"] = expanded_grid["text_0"].astype(str) + "_" + expanded_grid["text_1"].astype(str)
         expanded_grid["delta"] = abs(deltas[deltas["id"] == id]["delta"].values[0])
@@ -73,10 +74,9 @@ deltas_similarities_dropped = deltas_similarities[['delta', '0_1', '0_2', '0_3',
 ## linear regression
 trn_idx, test_idx = train_test_split(np.arange(101), test_size = .1, random_state = 1)
 
-model = LinearRegression()
+# Just 1_9
 
-# all similarities
-X = deltas_similarities_dropped[['0_1', '0_2', '0_3', '0_4', '0_5', '0_6', '0_7', '0_8', '0_9', '1_2', '1_3', '1_4', '1_5', '1_6', '1_7', '1_8', '1_9', '2_3', '2_4', '2_5', '2_6', '2_7', '2_8', '2_9', '3_4', '3_5', '3_6', '3_7', '3_8', '3_9', '4_5', '4_6', '4_7', '4_8', '4_9', '5_6', '5_7', '5_8', '5_9', '6_7', '6_8', '6_9', '7_8', '7_9', '8_9']]
+X = deltas_similarities_dropped[['1_9']]
 
 model.fit(X.iloc[trn_idx], deltas_similarities_dropped[["delta"]].iloc[trn_idx])
 
@@ -86,9 +86,10 @@ mean_squared_error(deltas_similarities_dropped[["delta"]].iloc[test_idx], test_p
 
 r2_score(deltas_similarities_dropped[["delta"]].iloc[test_idx], test_pred)
 
-# Just 0_9
+model = LinearRegression()
 
-X = deltas_similarities_dropped[['1_9']]
+# all similarities
+X = deltas_similarities_dropped[['0_1', '0_2', '0_3', '0_4', '0_5', '0_6', '0_7', '0_8', '0_9', '1_2', '1_3', '1_4', '1_5', '1_6', '1_7', '1_8', '1_9', '2_3', '2_4', '2_5', '2_6', '2_7', '2_8', '2_9', '3_4', '3_5', '3_6', '3_7', '3_8', '3_9', '4_5', '4_6', '4_7', '4_8', '4_9', '5_6', '5_7', '5_8', '5_9', '6_7', '6_8', '6_9', '7_8', '7_9', '8_9']]
 
 model.fit(X.iloc[trn_idx], deltas_similarities_dropped[["delta"]].iloc[trn_idx])
 
