@@ -40,6 +40,8 @@ This project derives its inspiration from two main previous papers: "Attitude Ch
 
 # 3. Dataset and Features
 
+This project thanks the CDD for sharing their data. For this project, I have access to surveys and transcripts from three Deliberative Polls, each consisting of about 14 groups, with each group disucssing in two or three different sessions. The surveys allow me to calculate opinion change on the issues discussed in each session before and after the deliberations. I use these pre- and post-surveys (responses on a 1-10 scale) to calculate an average delta in opinion change for each deliberative group for each topic session which I use as my dependent variable. The transcripts are broken down by group by session, but they are not attributed to specific individuals. While the additional granularity of individually-attributed transcripts would have great and is something to consider devoting resources to in the future, these group-level opinion deltas and transcripts provide enough data to complete the task. In total, there are 101 examples. I break these down into 71 training examples, 20 validation examples, and 10 test examples. 
+
 # 4. Methods
 
 # 5. Experiments/ Results/ Discussion
