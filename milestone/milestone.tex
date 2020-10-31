@@ -1,4 +1,4 @@
-\documentclass[11pt,]{article}
+\documentclass[12pt,]{article}
 \usepackage[left=1in,top=1in,right=1in,bottom=1in]{geometry}
 \newcommand*{\authorfont}{\fontfamily{phv}\selectfont}
 \usepackage[]{mathpazo}
@@ -39,6 +39,7 @@
 
 \setcounter{secnumdepth}{0}
 
+\usepackage{longtable,booktabs}
 
 
 
@@ -246,34 +247,68 @@ are not attributed to specific individuals. While the additional
 granularity of individually-attributed transcripts would have great and
 is something to consider devoting resources to in the future, these
 group-level opinion deltas and transcripts provide enough data to
-complete the task. In total, there are 101 examples. I break these down
-into 71 training examples, 20 validation examples, and 10 test examples.
+complete the task. In total, there are 101 examples. examples.
 
 \hypertarget{methods}{%
 \section{4. Methods}\label{methods}}
 
-To capture changes in the differences in the words that disscusants use
+To capture changes in the differences in the words that discussants use
 through their deliberations, I break each transcript down into 1/10th
 chunks. I then calculated the similarity of each 1/10th chunk to each
-other by comparing the word embeddings of each chunk {[}spacy{]}. For
-example, of a given transcript, there might be a similarity of .9
-between the first and second 1/10th chunks and a similarity of .7
-between the third and fourth 1/10th chunks. I use these similarities
-from each transcript to build two simple OLS models {[}sklearn{]}. The
-first baseline model just uses the similarity of the second and tenth
-chunks (the first chunk is generally devoted to introductions, welcomes,
-etc.) to predict opinion deltas. The second model uses all of the
-similarities to try predict opinion deltas. I also train a basic neural
-network in Pytorch to try to predict the opinion deltas from all of the
-similarities.
+other by comparing the word embeddings of each chunk (Honnibal and
+Montani 2017). For example, of a given transcript, there might be a
+similarity of .9 between the first and second 1/10th chunks and a
+similarity of .7 between the third and fourth 1/10th chunks. I use these
+similarities from each transcript to build two simple OLS models
+(Pedregosa et al. 2011). The first baseline model just uses the
+similarity of the second and tenth chunks (the first chunk is generally
+devoted to introductions, welcomes, etc.) to predict opinion deltas. The
+second model uses all of the similarities to try predict opinion deltas.
+I also train a basic neural network in Pytorch (Paszke et al. 2019) to
+try to predict the opinion deltas from all of the similarities.
 
 In addition to this approach of using word embeddings, I also build a
-baseline model using Long short-term memory on the sequences of words in
-the transcripts.
+baseline model using Long Short-Term Memory in Pytorch on the sequences
+of words in the transcripts.
+
+All code examples that I used to build these models can be found
+commented in my code.
 
 \hypertarget{experiments-results-discussion}{%
 \section{5. Experiments/ Results/
 Discussion}\label{experiments-results-discussion}}
+
+The main loss function that I use is Mean Squared Error since I am
+trying to predict a specific value (as opposed to a discrete prediction
+of whether a group of people changed their opinions at all). Below is a
+table of the MSE of the three methods mentioned in section 4.
+
+\begin{longtable}[]{@{}lr@{}}
+\toprule
+method & MSE\tabularnewline
+\midrule
+\endhead
+One word embedding & 0.149\tabularnewline
+All word embeddings & 0.289\tabularnewline
+Basic NN & 0.064\tabularnewline
+LSTM & 0.130\tabularnewline
+\bottomrule
+\end{longtable}
+
+Using the one similarity of the word embeddings has a lower loss than
+using all of the similarities of the word embeddings. But both of these
+perform worse than a basic neural network. The neural network that I
+used was very simple with only two linear activation functions and one
+ReLU that took in all 45 of the similarities from the combination of
+word embeddings.
+
+Despite the varying levels of loss, all of the models seem to be
+performing poorly upon closer inspection. If you actually examine the
+predicted values, you see that they are all basically the same.
+Particularly the basic NN, which has the lowest loss, and the LSTM are
+simply finding the best average value and applying that ``prediction''
+to all test examples. To try to circumvent this problem, I am going to
+try to incorporate data from the Priniski paper.
 
 \hypertarget{next-steps}{%
 \section{6. Next Steps}\label{next-steps}}
@@ -289,11 +324,32 @@ relatively small number of training examples available. And so, I will
 also leverage transformers to see if they provide the ability to better
 predict opinion change.
 
+\newpage
+
 \hypertarget{references}{%
 \section*{References}\label{references}}
 \addcontentsline{toc}{section}{References}
 
 \hypertarget{refs}{}
+\leavevmode\hypertarget{ref-spacy2}{}%
+Honnibal, Matthew, and Ines Montani. 2017. ``spaCy 2: Natural Language
+Understanding with Bloom Embeddings, Convolutional Neural Networks and
+Incremental Parsing.''
+
+\leavevmode\hypertarget{ref-pytorch}{}%
+Paszke, Adam, Sam Gross, Francisco Massa, Adam Lerer, James Bradbury,
+Gregory Chanan, Trevor Killeen, et al. 2019. ``PyTorch: An Imperative
+Style, High-Performance Deep Learning Library.'' In \emph{Advances in
+Neural Information Processing Systems 32}, edited by H. Wallach, H.
+Larochelle, A. Beygelzimer, F. Alche-Buc, E. Fox, and R. Garnett,
+8024--35. Curran Associates, Inc.
+\url{http://papers.neurips.cc/paper/9015-pytorch-an-imperative-style-high-performance-deep-learning-library.pdf}.
+
+\leavevmode\hypertarget{ref-scikit-learn}{}%
+Pedregosa, F., G. Varoquaux, A. Gramfort, V. Michel, B. Thirion, O.
+Grisel, M. Blondel, et al. 2011. ``Scikit-Learn: Machine Learning in
+Python.'' \emph{Journal of Machine Learning Research} 12: 2825--30.
+
 \leavevmode\hypertarget{ref-cmv}{}%
 Priniski, John Hunter, and Zach Horne. 2018. ``Attitude Change on
 Reddit's Change My View.'' \emph{Conference: Proceedings of the 40th
