@@ -7,13 +7,13 @@
 # This script contains the code for the milestone
 # For the milestone, I will be making a variety of baseline models
 # These baseline models _will not_ include any linguistic features
-# I will focus on linguistic features for the main model
+# I will focus on linguistic features for the final project
 
+# In this file, I will use similarities of word embeddings as inputs to various models
 # There will be three models that I will train
-# 1. tf-idf with some sort of regression
-# 2. RNN with pre-trained sentiment
-# 3. LSTM (on text)
-# 4. Various transformers
+# 1. OLS using the similarity of the 2nd compared to the 10th chunk of the transciprts
+# 2. OLS using similarities of all the chunks
+# 3. Basic NN using similarities of all the chunks
 
 ### tf-idf
 
@@ -28,7 +28,7 @@ from sklearn.metrics import mean_squared_error, r2_score
 import matplotlib.pyplot as plt
 from scipy import stats
 
-## going to try more similarity stuff
+# calculating similarities of each chunk for each transcript
 import itertools
 from sklearn.model_selection import train_test_split
 
@@ -43,18 +43,22 @@ def expand_grid(data_dict):
 
 deltas = pd.read_csv("data/processed/survey/opinion_deltas.csv")
 deltas_similarities = pd.DataFrame()
+# going to loop over every id of transcripts
 for id in deltas["id"]:
     n_chunks = 10
     try:
         doc = docx.Document("data/processed/transcripts/" + id + ".docx")
-        paragraphs = [p.text for p in doc.paragraphs][:-10]
+        paragraphs = [p.text for p in doc.paragraphs]
+        # breaking the transciprts into 1/0th chunks
         chunks = list(divide_chunks(paragraphs, n_chunks))
         expanded_grid = expand_grid({"text_0": range(0, 10),
                                     "text_1": range(0, 10)})
         similarities = []
+        # going to loop over every combination of chunks
         for i in range(0, len(expanded_grid)):
             text_0 = nlp(''.join(map(str, chunks[expanded_grid["text_0"][i]])))
             text_1 = nlp(''.join(map(str, chunks[expanded_grid["text_1"][i]])))
+            # calculates the word embedding similarities of each chunk to each other
             similarities.append(text_0.similarity(text_1))
         expanded_grid["similarity"] = similarities
         expanded_grid["comparison"] = expanded_grid["text_0"].astype(str) + "_" + expanded_grid["text_1"].astype(str)
@@ -65,14 +69,17 @@ for id in deltas["id"]:
         print(id)
 
     except Exception:
+        # some transcripts are missing from the dataset, going to just skip over them and assume they are randomly missing
         print()
         print("passed on " + id + ". No transcript.")
         pass
 
+# clean up the dataset a little, could have just run the similarities on these chunks to save time
+# can implement in the future
 deltas_similarities_dropped = deltas_similarities[['delta', '0_1', '0_2', '0_3', '0_4', '0_5', '0_6', '0_7', '0_8', '0_9', '1_2', '1_3', '1_4', '1_5', '1_6', '1_7', '1_8', '1_9', '2_3', '2_4', '2_5', '2_6', '2_7', '2_8', '2_9', '3_4', '3_5', '3_6', '3_7', '3_8', '3_9', '4_5', '4_6', '4_7', '4_8', '4_9', '5_6', '5_7', '5_8', '5_9', '6_7', '6_8', '6_9', '7_8', '7_9', '8_9']]
 
 ## linear regression
-trn_idx, test_idx = train_test_split(np.arange(101), test_size = .1, random_state = 1)
+trn_idx, test_idx = train_test_split(np.arange(101), test_size = .1, random_state = 4)
 
 model = LinearRegression()
 
@@ -87,7 +94,6 @@ test_pred = model.predict(X.iloc[test_idx])
 mean_squared_error(deltas_similarities_dropped[["delta"]].iloc[test_idx], test_pred)
 
 r2_score(deltas_similarities_dropped[["delta"]].iloc[test_idx], test_pred)
-
 
 # all similarities
 X = deltas_similarities_dropped[['0_1', '0_2', '0_3', '0_4', '0_5', '0_6', '0_7', '0_8', '0_9', '1_2', '1_3', '1_4', '1_5', '1_6', '1_7', '1_8', '1_9', '2_3', '2_4', '2_5', '2_6', '2_7', '2_8', '2_9', '3_4', '3_5', '3_6', '3_7', '3_8', '3_9', '4_5', '4_6', '4_7', '4_8', '4_9', '5_6', '5_7', '5_8', '5_9', '6_7', '6_8', '6_9', '7_8', '7_9', '8_9']]
@@ -137,7 +143,7 @@ class SimpleNet(nn.Module):
     # Initialize the layers
     def __init__(self):
         super().__init__()
-        self.linear1 = nn.Linear(45, 10)
+        self.linear1 = nn.Linear(45, 1)
         self.act1 = nn.ReLU() # Activation function
         self.linear2 = nn.Linear(10, 1)
 
