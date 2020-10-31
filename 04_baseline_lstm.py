@@ -116,9 +116,9 @@ test_seq_tensor = seq_tensor[int(length*(PCT_TRAIN+PCT_VALID)):]
 test_seq_lengths = seq_lengths[int(length*(PCT_TRAIN+PCT_VALID)):]
 test_label = label[int(length*(PCT_TRAIN+PCT_VALID)):]
 
-print(train_seq_tensor.shape) # torch.Size([4200, 30772])
-print(valid_seq_tensor.shape) # torch.Size([1199, 30772])
-print(test_seq_tensor.shape) # torch.Size([601, 30772])
+print(train_seq_tensor.shape)
+print(valid_seq_tensor.shape)
+print(test_seq_tensor.shape)
 
 # Instantiate data loaders
 batch_size = 70
@@ -188,13 +188,6 @@ lengths = torch.tensor([5,3], dtype = torch.int64).cpu()  # should be a 1D / CPU
 result = pack_padded_sequence(seqs, lengths, batch_first=True)
 print(result.data) # tensor([1, 6, 2, 7, 3, 8, 4, 5])
 print(result.batch_sizes) # tensor([2, 2, 2, 1, 1])
-
-# seq_1) 1 2 3 4 5
-# seq_2) 6 7 8 0 0
-# batch) 2 2 2 1 1
-
-# training params
-
 
 vocab_size = len(vocab_to_int)
 embedding_dim = 100 # int(vocab_size ** 0.25) # 15
