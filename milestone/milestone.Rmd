@@ -44,9 +44,9 @@ This project thanks the CDD for sharing their data. For this project, I have acc
 
 # 4. Methods
 
-To capture changes in the differences in the words that discussants use through their deliberations, I break each transcript down into 1/10th chunks. I then calculated the similarity of each 1/10th chunk to each other by comparing the word embeddings of each chunk [@spacy2]. For example, of a given transcript, there might be a similarity of .9 between the first and second 1/10th chunks and a similarity of .7 between the third and fourth 1/10th chunks. I use these similarities from each transcript to build two simple OLS models [sklearn]. The first baseline model just uses the similarity of the second and tenth chunks (the first chunk is generally devoted to introductions, welcomes, etc.) to predict opinion deltas. The second model uses all of the similarities to try predict opinion deltas. I also train a basic neural network in Pytorch to try to predict the opinion deltas from all of the similarities. 
+To capture changes in the differences in the words that discussants use through their deliberations, I break each transcript down into 1/10th chunks. I then calculated the similarity of each 1/10th chunk to each other by comparing the word embeddings of each chunk [@spacy2]. For example, of a given transcript, there might be a similarity of .9 between the first and second 1/10th chunks and a similarity of .7 between the third and fourth 1/10th chunks. I use these similarities from each transcript to build two simple OLS models [scikit-learn]. The first baseline model just uses the similarity of the second and tenth chunks (the first chunk is generally devoted to introductions, welcomes, etc.) to predict opinion deltas. The second model uses all of the similarities to try predict opinion deltas. I also train a basic neural network in Pytorch [@pytorch] to try to predict the opinion deltas from all of the similarities. 
 
-In addition to this approach of using word embeddings, I also build a baseline model using Long short-term memory on the sequences of words in the transcripts. 
+In addition to this approach of using word embeddings, I also build a baseline model using Long Short-Term Memory in Pytorch on the sequences of words in the transcripts. 
 
 All code examples that I used to build these models can be found commented in my code. 
 
