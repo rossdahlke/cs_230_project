@@ -1,0 +1,381 @@
+\documentclass[12pt,]{article}
+\usepackage[left=1in,top=1in,right=1in,bottom=1in]{geometry}
+\newcommand*{\authorfont}{\fontfamily{phv}\selectfont}
+\usepackage[]{mathpazo}
+
+
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+
+
+
+
+\usepackage{abstract}
+\renewcommand{\abstractname}{}    % clear the title
+\renewcommand{\absnamepos}{empty} % originally center
+
+\renewenvironment{abstract}
+ {{%
+    \setlength{\leftmargin}{0mm}
+    \setlength{\rightmargin}{\leftmargin}%
+  }%
+  \relax}
+ {\endlist}
+
+\makeatletter
+\def\@maketitle{%
+  \newpage
+%  \null
+%  \vskip 2em%
+%  \begin{center}%
+  \let \footnote \thanks
+    {\fontsize{18}{20}\selectfont\raggedright  \setlength{\parindent}{0pt} \@title \par}%
+}
+%\fi
+\makeatother
+
+
+
+
+\setcounter{secnumdepth}{0}
+
+\usepackage{longtable,booktabs}
+
+
+
+\title{Predicting Opinion Change in Deliberative Groups (Natural Language
+Processing) \thanks{Code and data available at: github.com/rossdahlke/cs\_230\_project}  }
+
+
+
+\author{\Large Ross Dahlke
+(\href{mailto:rdahlke@stanford.edu}{\nolinkurl{rdahlke@stanford.edu}})\vspace{0.05in} \newline\normalsize\emph{}  }
+
+
+\date{}
+
+\usepackage{titlesec}
+
+\titleformat*{\section}{\normalsize\bfseries}
+\titleformat*{\subsection}{\normalsize\itshape}
+\titleformat*{\subsubsection}{\normalsize\itshape}
+\titleformat*{\paragraph}{\normalsize\itshape}
+\titleformat*{\subparagraph}{\normalsize\itshape}
+
+
+
+
+
+\newtheorem{hypothesis}{Hypothesis}
+\usepackage{setspace}
+
+
+% set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+
+
+% move the hyperref stuff down here, after header-includes, to allow for - \usepackage{hyperref}
+
+\makeatletter
+\@ifpackageloaded{hyperref}{}{%
+\ifxetex
+  \PassOptionsToPackage{hyphens}{url}\usepackage[setpagesize=false, % page size defined by xetex
+              unicode=false, % unicode breaks when used with xetex
+              xetex]{hyperref}
+\else
+  \PassOptionsToPackage{hyphens}{url}\usepackage[draft,unicode=true]{hyperref}
+\fi
+}
+
+\@ifpackageloaded{color}{
+    \PassOptionsToPackage{usenames,dvipsnames}{color}
+}{%
+    \usepackage[usenames,dvipsnames]{color}
+}
+\makeatother
+\hypersetup{breaklinks=true,
+            bookmarks=true,
+            pdfauthor={Ross Dahlke
+(\href{mailto:rdahlke@stanford.edu}{\nolinkurl{rdahlke@stanford.edu}}) ()},
+             pdfkeywords = {},  
+            pdftitle={Predicting Opinion Change in Deliberative Groups (Natural Language
+Processing)},
+            colorlinks=true,
+            citecolor=blue,
+            urlcolor=blue,
+            linkcolor=magenta,
+            pdfborder={0 0 0}}
+\urlstyle{same}  % don't use monospace font for urls
+
+% Add an option for endnotes. -----
+
+
+% add tightlist ----------
+\providecommand{\tightlist}{%
+\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+
+% add some other packages ----------
+
+% \usepackage{multicol}
+% This should regulate where figures float
+% See: https://tex.stackexchange.com/questions/2275/keeping-tables-figures-close-to-where-they-are-mentioned
+\usepackage[section]{placeins}
+
+
+\begin{document}
+	
+% \pagenumbering{arabic}% resets `page` counter to 1 
+%
+% \maketitle
+
+{% \usefont{T1}{pnc}{m}{n}
+\setlength{\parindent}{0pt}
+\thispagestyle{plain}
+{\fontsize{18}{20}\selectfont\raggedright 
+\maketitle  % title \par  
+
+}
+
+{
+   \vskip 13.5pt\relax \normalsize\fontsize{11}{12} 
+\textbf{\authorfont Ross Dahlke
+(\href{mailto:rdahlke@stanford.edu}{\nolinkurl{rdahlke@stanford.edu}})} \hskip 15pt \emph{\small }   
+
+}
+
+}
+
+
+
+
+
+
+\vskip -8.5pt
+
+
+ % removetitleabstract
+
+\noindent \singlespacing 
+
+\hypertarget{introduction}{%
+\section{1. Introduction}\label{introduction}}
+
+Deliberative Democracy is when a representative sample of people come
+together for a short period of time to discuss civic issues. The idea is
+that through a deliberative process, where people have access to
+objective information and good conditions to discuss, people can come to
+conclusions on civic issues that are most representative of what people
+actually want (Fishkin 2018). In a time where so much discussion about
+political and civic issues happens in online information bubbles,
+Deliberative Democracy offers a chance for people to discuss issues on
+their merit and the freedom to change their opinions in order to reveal
+a better representation of public opinion.
+
+Deliberative Democracy Polling is a technique pioneered by Stanford
+University Professor Jim Fishkin and the Center for Deliberative
+Democracy (CDD). A Deliberative Poll is where individuals are asked
+about their opinions before and after a weekend of small-group
+deliberation. This method allows researchers to measure the change in
+people's opinions as a result of the deliberative sessions.
+
+This project uses the results of surveys and transcripts from the CDD's
+Deliberative Polls to predict group opinion change based on the
+transcripts from the groups' deliberative sessions. In talking with
+members of the CDD, they theorized that computational approaches to
+predicting opinion change might be difficult because of the narrow focus
+of each of the deliberative sessions. For example, one whole session
+might be devoted to discussing water policy. And so, water is the main
+topic of discussion the entire time. Folks from the CDD have also
+concluded that participants often don't explicitly say that they have
+changed their opinion on the topic of the deliberative session, even if
+they reveal a change in opinion in the survey. Given this prior
+information, I will work on building a model to predict opinion change
+in two steps:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  (For this milestone) Experimenting with predicting opinion change
+  based on the words and text of the deliberative sessions.
+\item
+  (For the final submission) Experimenting with predicting opinion
+  change by incorporating linguistic features
+\end{enumerate}
+
+Based on previous discussions with members of the CDD, I will first try
+to find a baseline model based on the text found in the transcripts. For
+the final project I will try to incorporate linguistic features into the
+models. Incorporating linguistic features will be a key component of
+this project because I hypothesize that it is not \emph{what} people
+talk about in the deliberative sessions, it is \emph{how} they talk
+about the issues that indicates opinion change. For example, how
+subjective or objective are the statements people are making in the
+deliberative setting, or how are sentences structured in groups that
+show opinion change versus don't show opinion change?
+
+\hypertarget{related-work}{%
+\section{2. Related work}\label{related-work}}
+
+This project derives its inspiration from two main papers: ``Attitude
+Change on Reddit's Change My View'' (Priniski and Horne 2018) and ``A
+Deep-Learning Approach for Identifying Collective Action Events with
+Text and Image Data from Social Media'' (Zhang and Pan 2019). The former
+paper found that the ``the amount of evidence provided in a discussion
+predicts attitude change'' on the Change My View Reddit forum. The
+latter paper was able to identify collective action events in China
+based on image and text data and provides inspiration on using text data
+to identify collective behavior that has real-world application and can
+be a component of future computational social science research.
+
+\hypertarget{dataset-and-features}{%
+\section{3. Dataset and Features}\label{dataset-and-features}}
+
+This project thanks the CDD for sharing their data. For this project, I
+have access to surveys and transcripts from three Deliberative Polls,
+each consisting of about 14 groups, with each group discussing in two or
+three different sessions. The surveys allow me to calculate opinion
+change on the issues discussed in each session before and after the
+deliberations. I use these pre- and post-surveys (responses on a 1-10
+scale) to calculate an average delta in opinion change for each
+deliberative group for each topic session which I use as my dependent
+variable.\footnote{See
+  \url{https://github.com/rossdahlke/cs_230_project/blob/master/preanalysis/preanalysis.pdf}
+  for a pre-analysis of the distribution of survey data} The transcripts
+are broken down by group by session, but they are not attributed to
+specific individuals. While the additional granularity of
+individually-attributed transcripts would have great and is something to
+consider devoting resources to in the future, these group-level opinion
+deltas and transcripts provide enough data to complete the task. In
+total, there are 101 examples.
+
+\hypertarget{methods}{%
+\section{4. Methods}\label{methods}}
+
+To capture changes in the differences in the words that discussants use
+through their deliberations, I break each transcript down into 1/10th
+chunks. I then calculated the similarity of each 1/10th chunk to each
+other by comparing the word embeddings of each chunk (Honnibal and
+Montani 2017). For example, of a given transcript, there might be a
+similarity of .9 between the first and second 1/10th chunks and a
+similarity of .7 between the third and fourth 1/10th chunks. I use these
+similarities from each transcript to build two simple OLS models
+(Pedregosa et al. 2011). The first baseline model just uses the
+similarity of the second and tenth chunks (the first chunk is generally
+devoted to introductions, welcomes, etc.) to predict opinion deltas. The
+second model uses all of the similarities to try to predict opinion
+deltas. I also train a basic neural network in Pytorch (Paszke et al.
+2019) to try to predict the opinion deltas from all of the similarities.
+
+In addition to this approach of using word embeddings, I also built a
+baseline model using Long Short-Term Memory in Pytorch on the sequences
+of words in the transcripts.
+
+All code examples that I used as starting points to build these models
+can be found commented in my code.
+
+\hypertarget{experiments-results-discussion}{%
+\section{5. Experiments/ Results/
+Discussion}\label{experiments-results-discussion}}
+
+The main loss function that I used is mean squared error since I am
+trying to predict a specific value (as opposed to a discrete prediction
+of whether a group of people changed their opinions at all). Below is a
+table of the MSEs of the four methods mentioned in section 4.
+
+\begin{longtable}[]{@{}lr@{}}
+\toprule
+method & MSE\tabularnewline
+\midrule
+\endhead
+One word embedding (spacy) & 0.149\tabularnewline
+All word embeddings (spacy) & 0.289\tabularnewline
+Basic NN (spacy) & 0.064\tabularnewline
+One word eembedding (BERT) & 0.141\tabularnewline
+All word embeddings (BERT) & 0.201\tabularnewline
+Basic NN (BERT) & 0.152\tabularnewline
+LSTM & 0.130\tabularnewline
+\bottomrule
+\end{longtable}
+
+Using the word embedding similarity of the 2nd and 10th 1/10th chunks
+has a lower loss than using all of the similarities of the embeddings.
+But both of these perform worse than a basic neural network. The neural
+network that I used was very simple with only two linear activation
+functions and one ReLU that took in all 45 of the similarities from the
+combination of word embeddings.
+
+Despite the varying levels of loss, all of the models seem to be
+performing poorly upon closer inspection. If you actually examine the
+predicted values, you see that they are all basically the same.
+Particularly the basic NN, which has the lowest loss, and the LSTM are
+simply finding the best average value and applying that ``prediction''
+to all test examples. When I tried to build a more complex neural
+network, the problem was only exacerbated. To try to circumvent this
+problem, I am going to try to incorporate data from the Priniski paper.
+
+\hypertarget{next-steps}{%
+\section{6. Next Steps}\label{next-steps}}
+
+These basic models provide a good baseline estimate of how well one can
+predict opinion change based on the words that people use in
+deliberations. My next steps are to incorporate linguistic features. I
+plan to incorporate the findings of the Priniski and Horne paper that
+the amount of evidence provided in discussions predicts opinion change.
+I will also examine the predictive ability of polarity and subjectivity
+of statements in the transcripts. One limitation of this project is the
+relatively small number of training examples available. And so, I
+potentially also leverage transformers to see if they provide the
+ability to better predict opinion change.
+
+\newpage
+
+\hypertarget{references}{%
+\section*{References}\label{references}}
+\addcontentsline{toc}{section}{References}
+
+\hypertarget{refs}{}
+\leavevmode\hypertarget{ref-fishkin}{}%
+Fishkin, James S. 2018. \emph{Democracy When the People Are Thinking:
+Revitalizing Our Politics Through Public Deliberation}. Oxford
+University Press.
+
+\leavevmode\hypertarget{ref-spacy2}{}%
+Honnibal, Matthew, and Ines Montani. 2017. ``spaCy 2: Natural Language
+Understanding with Bloom Embeddings, Convolutional Neural Networks and
+Incremental Parsing.''
+
+\leavevmode\hypertarget{ref-pytorch}{}%
+Paszke, Adam, Sam Gross, Francisco Massa, Adam Lerer, James Bradbury,
+Gregory Chanan, Trevor Killeen, et al. 2019. ``PyTorch: An Imperative
+Style, High-Performance Deep Learning Library.'' In \emph{Advances in
+Neural Information Processing Systems 32}, edited by H. Wallach, H.
+Larochelle, A. Beygelzimer, F. Alche-Buc, E. Fox, and R. Garnett,
+8024--35. Curran Associates, Inc.
+\url{http://papers.neurips.cc/paper/9015-pytorch-an-imperative-style-high-performance-deep-learning-library.pdf}.
+
+\leavevmode\hypertarget{ref-scikit-learn}{}%
+Pedregosa, F., G. Varoquaux, A. Gramfort, V. Michel, B. Thirion, O.
+Grisel, M. Blondel, et al. 2011. ``Scikit-Learn: Machine Learning in
+Python.'' \emph{Journal of Machine Learning Research} 12: 2825--30.
+
+\leavevmode\hypertarget{ref-cmv}{}%
+Priniski, John Hunter, and Zach Horne. 2018. ``Attitude Change on
+Reddit's Change My View.'' \emph{Conference: Proceedings of the 40th
+Annual Meeting of the Cognitive Science Society, Madison, Wisconsin}.
+\url{https://www.researchgate.net/publication/333175400_Attitude_Change_on_Reddit's_Change_My_View}.
+
+\leavevmode\hypertarget{ref-zhang}{}%
+Zhang, Han, and Jennifer Pan. 2019. ``CASM: A Deep-Learning Approach for
+Identifying Collective Action Events with Text and Image Data from
+Social Media.'' \emph{Sociological Methodology} 49 (1): 1--57.
+
+
+
+
+
+\newpage
+\singlespacing 
+\end{document}

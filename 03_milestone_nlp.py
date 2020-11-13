@@ -143,7 +143,7 @@ class SimpleNet(nn.Module):
     # Initialize the layers
     def __init__(self):
         super().__init__()
-        self.linear1 = nn.Linear(45, 1)
+        self.linear1 = nn.Linear(45, 10)
         self.act1 = nn.ReLU() # Activation function
         self.linear2 = nn.Linear(10, 1)
 
@@ -298,7 +298,7 @@ class SimpleNet(nn.Module):
     # Initialize the layers
     def __init__(self):
         super().__init__()
-        self.linear1 = nn.Linear(45, 1)
+        self.linear1 = nn.Linear(45, 10)
         self.act1 = nn.ReLU() # Activation function
         self.linear2 = nn.Linear(10, 1)
 
