@@ -175,3 +175,5 @@ data/
 data/*
 
 .DS_Store
+
+log/
