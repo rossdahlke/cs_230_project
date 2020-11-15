@@ -59,17 +59,23 @@ optimizer = AdamW(optimizer_grouped_parameters, lr = 1e-5)
 from transformers import BertTokenizer
 tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
 
-text_batch = [doc_list[i] for i in trn_idx]
-encoding = tokenizer(text_batch, return_tensors='pt', padding=True, truncation=True)
-input_ids = encoding['input_ids'].to(device)
-attention_mask = encoding['attention_mask'].to(device)
-labels = torch.tensor(np.round([delta_list[i] for i in trn_idx]))
+train_batch = [doc_list[i] for i in trn_idx]
+train_encoding = tokenizer(text_batch, return_tensors='pt', padding=True, truncation=True)
+train_input_ids = train_encoding['input_ids'].to(device)
+train_attention_mask = train_encoding['attention_mask'].to(device)
+train_labels = torch.tensor(np.round([delta_list[i] for i in trn_idx]))
 
 test_batch = [doc_list[i] for i in test_idx]
 test_encoding = tokenizer(test_batch, return_tensors='pt', padding=True, truncation=True)
 test_input_ids = test_encoding['input_ids'].to(device)
 test_attention_mask = test_encoding["attention_mask"].to(device)
 test_labels = torch.tensor(np.round([delta_list[i] for i in test_idx]))
+
+eval_batch = [doc_list[i] for i in val_idx]
+eval_encoding = tokenizer(eval_batch, return_tensors='pt', padding=True, truncation=True)
+eval_input_ids = eval_encoding['input_ids'].to(device)
+eval_attention_mask = eval_encoding["attention_mask"].to(device)
+eval_labels = torch.tensor(np.round([delta_list[i] for i in val_idx]))
 
 train_dataset = TensorDataset(input_ids, attention_mask, labels)
 
@@ -105,4 +111,4 @@ trainer.train()
 
 trainer.evaluate()
 
-model(test_input_ids, test_attention_mask, labels = test_labels)[0]
+model(eval_input_ids, eval_attention_mask, labels = eval_labels)[0]
