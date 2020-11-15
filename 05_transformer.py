@@ -39,7 +39,7 @@ torch.cuda.empty_cache()
 
 from transformers import BertForSequenceClassification, Trainer, TrainingArguments, InputFeatures
 
-model = BertForSequenceClassification.from_pretrained("bert-large-uncased")
+model = BertForSequenceClassification.from_pretrained("bert-large-uncased", num_labels = 1)
 
 from torch.utils.data import TensorDataset, DataLoader, RandomSampler, SequentialSampler
 from transformers import BertForSequenceClassification
@@ -58,19 +58,18 @@ optimizer = AdamW(optimizer_grouped_parameters, lr = 1e-5)
 
 from transformers import BertTokenizer
 tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+
 text_batch = [doc_list[i] for i in trn_idx]
 encoding = tokenizer(text_batch, return_tensors='pt', padding=True, truncation=True)
 input_ids = encoding['input_ids'].to(device)
 attention_mask = encoding['attention_mask'].to(device)
 labels = torch.tensor(np.round([delta_list[i] for i in trn_idx]))
-labels = labels.type(torch.LongTensor)
 
 test_batch = [doc_list[i] for i in test_idx]
 test_encoding = tokenizer(test_batch, return_tensors='pt', padding=True, truncation=True)
 test_input_ids = test_encoding['input_ids'].to(device)
 test_attention_mask = test_encoding["attention_mask"].to(device)
 test_labels = torch.tensor(np.round([delta_list[i] for i in test_idx]))
-test_labels = test_labels.type(torch.LongTensor)
 
 train_dataset = TensorDataset(input_ids, attention_mask, labels)
 
@@ -105,3 +104,5 @@ trainer = Trainer(
 trainer.train()
 
 trainer.evaluate()
+
+model(test_input_ids, test_attention_mask, labels = test_labels)[0]
