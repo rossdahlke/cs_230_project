@@ -176,4 +176,4 @@ data/*
 
 .DS_Store
 
-log/
+logs/
