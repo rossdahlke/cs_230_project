@@ -36,6 +36,7 @@ trn_idx, val_idx = train_test_split(trn_idx, test_size = .1, random_state = 4)
 # lets use some transformers
 import torch
 torch.cuda.empty_cache()
+self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 from torch.utils.data import TensorDataset, DataLoader, RandomSampler, SequentialSampler
 from transformers import BertForSequenceClassification
@@ -56,8 +57,8 @@ from transformers import BertTokenizer
 tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
 text_batch = [doc_list[i] for i in trn_idx]
 encoding = tokenizer(text_batch, return_tensors='pt', padding=True, truncation=True)
-input_ids = encoding['input_ids']
-attention_mask = encoding['attention_mask']
+input_ids = encoding['input_ids'].to(self.device)
+attention_mask = encoding['attention_mask'].to(self.device)
 labels = torch.tensor(np.round([delta_list[i] for i in trn_idx]))
 labels = labels.type(torch.LongTensor)
 
@@ -105,5 +106,3 @@ trainer = Trainer(
 trainer.train()
 
 trainer.evaluate()
-
-model(test_input_ids)
