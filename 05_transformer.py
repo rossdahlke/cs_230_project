@@ -111,4 +111,4 @@ trainer.train()
 
 trainer.evaluate()
 
-model(eval_input_ids, eval_attention_mask, labels = eval_labels)[0]
+model(eval_input_ids, eval_attention_mask, labels = eval_labels)
