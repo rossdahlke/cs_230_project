@@ -60,7 +60,7 @@ from transformers import BertTokenizer
 tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
 
 train_batch = [doc_list[i] for i in trn_idx]
-train_encoding = tokenizer(text_batch, return_tensors='pt', padding=True, truncation=True)
+train_encoding = tokenizer(train_batch, return_tensors='pt', padding=True, truncation=True)
 train_input_ids = train_encoding['input_ids'].to(device)
 train_attention_mask = train_encoding['attention_mask'].to(device)
 train_labels = torch.tensor(np.round([delta_list[i] for i in trn_idx]))
