@@ -36,13 +36,16 @@ trn_idx, val_idx = train_test_split(trn_idx, test_size = .1, random_state = 4)
 # lets use some transformers
 import torch
 torch.cuda.empty_cache()
-self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+from transformers import BertForSequenceClassification, Trainer, TrainingArguments, InputFeatures
+
+model = BertForSequenceClassification.from_pretrained("bert-large-uncased")
 
 from torch.utils.data import TensorDataset, DataLoader, RandomSampler, SequentialSampler
 from transformers import BertForSequenceClassification
-model = BertForSequenceClassification.from_pretrained('bert-base-uncased')
-
-model.train()
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+model.to(device) # without this there is no error, but it runs in CPU (instead of GPU).
+model.eval() # declaring to the system that we're only doing 'forward' calculations
 
 from transformers import AdamW
 
@@ -68,10 +71,6 @@ test_input_ids = test_encoding['input_ids']
 test_attention_mask = test_encoding["attention_mask"]
 test_labels = torch.tensor(np.round([delta_list[i] for i in test_idx]))
 test_labels = test_labels.type(torch.LongTensor)
-
-from transformers import BertForSequenceClassification, Trainer, TrainingArguments, InputFeatures
-
-model = BertForSequenceClassification.from_pretrained("bert-large-uncased")
 
 train_dataset = TensorDataset(input_ids, attention_mask, labels)
 
