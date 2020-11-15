@@ -77,7 +77,7 @@ eval_input_ids = eval_encoding['input_ids'].to(device)
 eval_attention_mask = eval_encoding["attention_mask"].to(device)
 eval_labels = torch.tensor(np.round([delta_list[i] for i in val_idx]))
 
-train_dataset = TensorDataset(input_ids, attention_mask, labels)
+train_dataset = TensorDataset(train_input_ids, train_attention_mask, train_labels)
 
 test_dataset = TensorDataset(test_input_ids, test_attention_mask, test_labels)
 
