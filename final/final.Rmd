@@ -55,8 +55,8 @@ All code examples that I used as starting points to build these models can be fo
 The main loss function that I used is mean squared error since I am trying to predict a specific value (as opposed to a discrete prediction of whether a group of people changed their opinions at all). Below is a table of the MSEs of the four methods mentioned in section 4. 
 
 ```{r, echo = F}
-knitr::kable(tibble::tibble(method = c("One word embedding (spacy)", "All word embeddings (spacy)", "Basic NN (spacy)", "One word eembedding (BERT)", "All word embeddings (BERT)", "Basic NN (BERT)",  "LSTM"),
-       MSE = c(.149, .289, .064, .141, .201, .152, .130)))
+knitr::kable(tibble::tibble(method = c("One word embedding (spacy)", "All word embeddings (spacy)", "Basic NN (spacy)", "One word eembedding (BERT)", "All word embeddings (BERT)", "Basic NN (BERT)",  "LSTM", "BERT transformer"),
+       MSE = c(.149, .289, .064, .141, .201, .152, .130, .227)))
 ```
 
 Using the word embedding similarity of the 2nd and 10th 1/10th chunks has a lower loss than using all of the similarities of the embeddings. But both of these perform worse than a basic neural network. The neural network that I used was very simple with only two linear activation functions and one ReLU that took in all 45 of the similarities from the combination of word embeddings. 
