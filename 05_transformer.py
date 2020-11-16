@@ -65,6 +65,7 @@ train_input_ids = train_input_ids.type(dtype = torch.long)
 train_attention_mask = train_encoding['attention_mask'].to(device).float()
 train_labels = torch.tensor([delta_list[i] for i in trn_idx])
 train_labels = train_labels.type(torch.float)
+train_labels = train_labels.to(device)
 
 test_batch = [doc_list[i] for i in test_idx]
 test_encoding = tokenizer(test_batch, return_tensors='pt', padding=True, truncation=True, max_length = 10)
@@ -73,12 +74,14 @@ test_input_ids = test_input_ids.type(dtype = torch.long)
 test_attention_mask = test_encoding["attention_mask"].to(device).float()
 test_labels = torch.tensor([delta_list[i] for i in test_idx])
 test_labels = test_labels.type(torch.float)
+test_labels = test_labels.to(device)
 
 eval_batch = [doc_list[i] for i in val_idx]
 eval_encoding = tokenizer(eval_batch, return_tensors='pt', padding=True, truncation=True, max_length = 10)
 eval_input_ids = eval_encoding['input_ids'].to(device).long()
 eval_attention_mask = eval_encoding["attention_mask"].to(device)
 eval_labels = torch.tensor([delta_list[i] for i in val_idx])
+eval_labels = eval_labels.to(device)
 
 train_dataset = TensorDataset(train_input_ids, train_attention_mask, train_labels)
 
