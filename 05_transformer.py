@@ -39,7 +39,6 @@ import torch
 from transformers import BertForSequenceClassification, Trainer, TrainingArguments, InputFeatures
 
 model = BertForSequenceClassification.from_pretrained("bert-large-uncased", num_labels = 1)
-model = torch.nn.DataParallel(model)
 
 from torch.utils.data import TensorDataset, DataLoader, RandomSampler, SequentialSampler
 from transformers import BertForSequenceClassification
@@ -115,6 +114,6 @@ trainer.train()
 
 torch.cuda.empty_cache()
 
-trainer.evaluate()
+# trainer.evaluate()
 
 model(eval_input_ids, eval_attention_mask, labels = eval_labels)
