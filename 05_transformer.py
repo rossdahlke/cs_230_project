@@ -39,6 +39,7 @@ import torch
 from transformers import BertForSequenceClassification, Trainer, TrainingArguments, InputFeatures
 
 model = BertForSequenceClassification.from_pretrained("bert-large-uncased", num_labels = 1)
+model = torch.nn.DataParallel(model)
 
 from torch.utils.data import TensorDataset, DataLoader, RandomSampler, SequentialSampler
 from transformers import BertForSequenceClassification
