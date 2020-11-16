@@ -113,6 +113,8 @@ trainer = Trainer(
 
 trainer.train()
 
+torch.cuda.empty_cache()
+
 trainer.evaluate()
 
 model(eval_input_ids, eval_attention_mask, labels = eval_labels)
