@@ -87,6 +87,8 @@ train_dataset = TensorDataset(train_input_ids, train_attention_mask, train_label
 
 test_dataset = TensorDataset(test_input_ids, test_attention_mask, test_labels)
 
+model.resize_token_embeddings(len(tokenizer))
+
 def dummy_data_collector(features):
     batch = {}
     batch['input_ids'] = torch.stack([f[0] for f in features])
