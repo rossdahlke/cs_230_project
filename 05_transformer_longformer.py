@@ -36,9 +36,9 @@ trn_idx, val_idx = train_test_split(trn_idx, test_size = .1, random_state = 4)
 # lets use some transformers
 import torch
 
-from transformers import BertForSequenceClassification, Trainer, TrainingArguments, InputFeatures
+from transformers import LongformerForSequenceClassification, Trainer, TrainingArguments, InputFeatures
 
-model = BertForSequenceClassification.from_pretrained("bert-large-uncased", num_labels = 1)
+model = LongformerForSequenceClassification.from_pretrained("allenai/longformer-base-4096", num_labels = 1)
 
 from torch.utils.data import TensorDataset, DataLoader, RandomSampler, SequentialSampler
 
@@ -55,11 +55,11 @@ optimizer_grouped_parameters = [
 ]
 optimizer = AdamW(optimizer_grouped_parameters, lr = 1e-5)
 
-from transformers import BertTokenizer
-tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+from transformers import LongformerTokenizer
+tokenizer = LongformerTokenizer.from_pretrained('allenai/longformer-base-4096')
 
 train_batch = [doc_list[i] for i in trn_idx]
-train_encoding = tokenizer(train_batch, return_tensors='pt', padding=True, truncation=True, max_length = 200)
+train_encoding = tokenizer(train_batch, return_tensors='pt', padding=True, truncation=True, max_length = 5000)
 train_input_ids = train_encoding['input_ids'].to(device)
 train_input_ids = train_input_ids.type(dtype = torch.long)
 train_attention_mask = train_encoding['attention_mask'].to(device).float()
@@ -68,7 +68,7 @@ train_labels = train_labels.type(torch.float)
 train_labels = train_labels.to(device)
 
 test_batch = [doc_list[i] for i in test_idx]
-test_encoding = tokenizer(test_batch, return_tensors='pt', padding=True, truncation=True, max_length = 200)
+test_encoding = tokenizer(test_batch, return_tensors='pt', padding=True, truncation=True, max_length = 5000)
 test_input_ids = test_encoding['input_ids'].to(device)
 test_input_ids = test_input_ids.type(dtype = torch.long)
 test_attention_mask = test_encoding["attention_mask"].to(device).float()
@@ -77,7 +77,7 @@ test_labels = test_labels.type(torch.float)
 test_labels = test_labels.to(device)
 
 eval_batch = [doc_list[i] for i in val_idx]
-eval_encoding = tokenizer(eval_batch, return_tensors='pt', padding=True, truncation=True, max_length = 200)
+eval_encoding = tokenizer(eval_batch, return_tensors='pt', padding=True, truncation=True, max_length = 5000)
 eval_input_ids = eval_encoding['input_ids'].to(device).long()
 eval_attention_mask = eval_encoding["attention_mask"].to(device)
 eval_labels = torch.tensor([delta_list[i] for i in val_idx])
@@ -96,7 +96,7 @@ def dummy_data_collector(features):
 
 training_args = TrainingArguments(
     output_dir='./results',          # output directory
-    num_train_epochs=100,              # total # of training epochs
+    num_train_epochs=1,              # total # of training epochs
     per_device_train_batch_size=1,  # batch size per device during training
     per_device_eval_batch_size=1,   # batch size for evaluation
     warmup_steps=500,                # number of warmup steps for learning rate scheduler
