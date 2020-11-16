@@ -42,8 +42,7 @@ model = BertForSequenceClassification.from_pretrained("bert-large-uncased", num_
 
 from torch.utils.data import TensorDataset, DataLoader, RandomSampler, SequentialSampler
 from transformers import BertForSequenceClassification
-# device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-device = torch.device("cpu")
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model.to(device) # without this there is no error, but it runs in CPU (instead of GPU).
 model.eval() # declaring to the system that we're only doing 'forward' calculations
 
