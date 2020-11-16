@@ -59,7 +59,7 @@ from transformers import BertTokenizer
 tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
 
 train_batch = [doc_list[i] for i in trn_idx]
-train_encoding = tokenizer(train_batch, return_tensors='pt', padding=True, truncation=True)
+train_encoding = tokenizer(train_batch, return_tensors='pt', padding=True, truncation=True, max_length = 10)
 train_input_ids = train_encoding['input_ids'].to(device)
 train_input_ids = train_input_ids.type(dtype = torch.long)
 train_attention_mask = train_encoding['attention_mask'].to(device).float()
@@ -67,7 +67,7 @@ train_labels = torch.tensor([delta_list[i] for i in trn_idx])
 train_labels = train_labels.type(torch.float)
 
 test_batch = [doc_list[i] for i in test_idx]
-test_encoding = tokenizer(test_batch, return_tensors='pt', padding=True, truncation=True)
+test_encoding = tokenizer(test_batch, return_tensors='pt', padding=True, truncation=True, max_length = 10)
 test_input_ids = test_encoding['input_ids'].to(device)
 test_input_ids = test_input_ids.type(dtype = torch.long)
 test_attention_mask = test_encoding["attention_mask"].to(device).float()
@@ -75,7 +75,7 @@ test_labels = torch.tensor([delta_list[i] for i in test_idx])
 test_labels = test_labels.type(torch.float)
 
 eval_batch = [doc_list[i] for i in val_idx]
-eval_encoding = tokenizer(eval_batch, return_tensors='pt', padding=True, truncation=True)
+eval_encoding = tokenizer(eval_batch, return_tensors='pt', padding=True, truncation=True, max_length = 10)
 eval_input_ids = eval_encoding['input_ids'].to(device).long()
 eval_attention_mask = eval_encoding["attention_mask"].to(device)
 eval_labels = torch.tensor([delta_list[i] for i in val_idx])
