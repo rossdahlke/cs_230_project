@@ -30,7 +30,7 @@ for id in deltas["id"]:
         pass
 
 # split into train, test, and validation datasets
-trn_idx, test_idx = train_test_split(np.arange(101), test_size = .1, random_state = 4)
+trn_idx, test_idx = train_test_split(np.arange(101), test_size = .05, random_state = 4)
 trn_idx, val_idx = train_test_split(trn_idx, test_size = .1, random_state = 4)
 
 # lets use some transformers
