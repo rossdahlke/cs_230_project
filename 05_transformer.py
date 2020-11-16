@@ -101,7 +101,8 @@ training_args = TrainingArguments(
     per_device_eval_batch_size=1,   # batch size for evaluation
     warmup_steps=500,                # number of warmup steps for learning rate scheduler
     weight_decay=0.01,               # strength of weight decay
-    logging_dir='./logs'
+    logging_dir='./logs',
+    save_total_limit=1,
 )
 
 trainer = Trainer(
