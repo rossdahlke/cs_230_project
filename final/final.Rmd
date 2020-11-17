@@ -44,7 +44,7 @@ This project thanks the CDD for sharing their data. For this project, I have acc
 
 # 4. Methods
 
-To capture changes in the differences in the words that discussants use through their deliberations, I break each transcript down into 1/10th chunks. I then calculated the similarity of each 1/10th chunk to each other by comparing the word embeddings of each chunk. I used similarities from the spacy core model [@spacy2] and BERT [citation. For example, of a given transcript, there might be a similarity of .9 between the first and second 1/10th chunks and a similarity of .7 between the third and fourth 1/10th chunks. I use these similarities from each transcript to build two simple OLS models [@scikit-learn]. The first baseline model just uses the similarity of the second and tenth chunks (the first chunk is generally devoted to introductions, welcomes, etc.) to predict opinion deltas. The second model uses all of the similarities to try to predict opinion deltas. I also train a basic neural network in Pytorch [@pytorch] to try to predict the opinion deltas from all of the similarities. The BERT embeddings performed better than the spacy core model in the regressions, but not in the basic neural network.  
+To capture changes in the differences in the words that discussants use through their deliberations, I break each transcript down into 1/10th chunks. I then calculated the similarity of each 1/10th chunk to each other by comparing the word embeddings of each chunk. I used similarities from the spacy core model [@spacy2] and BERT [@bert]. For example, of a given transcript, there might be a similarity of .9 between the first and second 1/10th chunks and a similarity of .7 between the third and fourth 1/10th chunks. I use these similarities from each transcript to build two simple OLS models [@scikit-learn]. The first baseline model just uses the similarity of the second and tenth chunks (the first chunk is generally devoted to introductions, welcomes, etc.) to predict opinion deltas. The second model uses all of the similarities to try to predict opinion deltas. I also train a basic neural network in Pytorch [@pytorch] to try to predict the opinion deltas from all of the similarities. The BERT embeddings performed better than the spacy core model in the regressions, but not in the basic neural network.  
 
 ```{r include = T, echo = F, out.width = "50%", fig.align = "center", fig.cap = "Fig. 1: Architecture of basic neural network used on the similarities of word embeddings."}
 knitr::include_graphics("figures/basic_nn.png")
@@ -61,7 +61,7 @@ All code examples that I used as starting points to build these models can be fo
 The main loss function that I used is mean squared error since I am trying to predict a specific value (as opposed to a discrete prediction of whether a group of people changed their opinions at all). Below is a table of the MSEs of the four methods mentioned in section 4. 
 
 ```{r, echo = F}
-knitr::kable(tibble::tibble(method = c("One word embedding (spacy)", "All word embeddings (spacy)", "Basic NN (spacy)", "One word eembedding (BERT)", "All word embeddings (BERT)", "Basic NN (BERT)",  "LSTM", "BERT transformer"),
+knitr::kable(tibble::tibble(method = c("One word embedding (spacy)", "All word embeddings (spacy)", "Basic NN (spacy)", "One word embedding (BERT)", "All word embeddings (BERT)", "Basic NN (BERT)",  "LSTM", "BERT transformer"),
        MSE = c(.149, .289, .064, .141, .201, .152, .130, .227)))
 ```
 

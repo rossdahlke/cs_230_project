@@ -242,10 +242,10 @@ through their deliberations, I break each transcript down into 1/10th
 chunks. I then calculated the similarity of each 1/10th chunk to each
 other by comparing the word embeddings of each chunk. I used
 similarities from the spacy core model (Honnibal and Montani 2017) and
-BERT {[}citation. For example, of a given transcript, there might be a
-similarity of .9 between the first and second 1/10th chunks and a
-similarity of .7 between the third and fourth 1/10th chunks. I use these
-similarities from each transcript to build two simple OLS models
+BERT (Devlin et al. 2019). For example, of a given transcript, there
+might be a similarity of .9 between the first and second 1/10th chunks
+and a similarity of .7 between the third and fourth 1/10th chunks. I use
+these similarities from each transcript to build two simple OLS models
 (Pedregosa et al. 2011). The first baseline model just uses the
 similarity of the second and tenth chunks (the first chunk is generally
 devoted to introductions, welcomes, etc.) to predict opinion deltas. The
@@ -291,7 +291,7 @@ method & MSE\tabularnewline
 One word embedding (spacy) & 0.149\tabularnewline
 All word embeddings (spacy) & 0.289\tabularnewline
 Basic NN (spacy) & 0.064\tabularnewline
-One word eembedding (BERT) & 0.141\tabularnewline
+One word embedding (BERT) & 0.141\tabularnewline
 All word embeddings (BERT) & 0.201\tabularnewline
 Basic NN (BERT) & 0.152\tabularnewline
 LSTM & 0.130\tabularnewline
@@ -342,6 +342,11 @@ to predict opinion change.
 \addcontentsline{toc}{section}{References}
 
 \hypertarget{refs}{}
+\leavevmode\hypertarget{ref-bert}{}%
+Devlin, Jacob, Ming-Wei Chang, Kenton Lee, and Kristina Toutanova. 2019.
+``BERT: Pre-Training of Deep Bidirectional Transformers for Language
+Understanding.'' \url{http://arxiv.org/abs/1810.04805}.
+
 \leavevmode\hypertarget{ref-fishkin}{}%
 Fishkin, James S. 2018. \emph{Democracy When the People Are Thinking:
 Revitalizing Our Politics Through Public Deliberation}. Oxford
