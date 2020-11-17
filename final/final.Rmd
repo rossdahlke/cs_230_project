@@ -19,6 +19,7 @@ fontsize: 12pt
 spacing: single
 bibliography: ../milestone/bibliography.bib
 biblio-style: apsr
+header-includes: \usepackage{graphicx}
 ---
 
 # 1. Introduction
@@ -27,12 +28,11 @@ Deliberative Democracy is when a representative sample of people come together f
 
 Deliberative Democracy Polling is a technique pioneered by Stanford University Professor Jim Fishkin and the Center for Deliberative Democracy (CDD). A Deliberative Poll is where individuals are asked about their opinions before and after a weekend of small-group deliberation. This method allows researchers to measure the change in people's opinions as a result of the deliberative sessions. 
 
-This project uses the results of surveys and transcripts from the CDD's Deliberative Polls to predict group opinion change based on the transcripts from the groups' deliberative sessions. In talking with members of the CDD, they theorized that computational approaches to predicting opinion change might be difficult because of the narrow focus of each of the deliberative sessions. For example, one whole session might be devoted to discussing water policy. And so, water is the main topic of discussion the entire time. Folks from the CDD have also concluded that participants often don't explicitly say that they have changed their opinion on the topic of the deliberative session, even if they reveal a change in opinion in the survey. Given this prior information, I will work on building a model to predict opinion change in two steps:
+For example, one session in Ghana was about water and agricultural policies in the country. Here is a excerpt of one of the participants expressing their opinion to the group when talking about farmers and their personal beliefs.
 
-  1. (For this milestone) Experimenting with predicting opinion change based on the words and text of the deliberative sessions.
-  2. (For the final submission) Experimenting with predicting opinion change by incorporating linguistic features
-  
-Based on previous discussions with members of the CDD, I will first try to find a baseline model based on the text found in the transcripts. For the final project I will try to incorporate linguistic features into the models. Incorporating linguistic features will be a key component of this project because I hypothesize that it is not _what_ people talk about in the deliberative sessions, it is _how_ they talk about the issues that indicates opinion change. For example, how subjective or objective are the statements people are making in the deliberative setting, or how are sentences structured in groups that show opinion change versus don't show opinion change?
+> What would really help our farmers is the marketing of their produce. That is what the farmers need. If they aren’t able to better market their produce, you would see that middlemen come and take advantage of them. At the end of the day, the farmers are frustrated and have to sell for less. This isn’t a good thing and needs to be addressed to support our farmers. The government needs to do this. In the past, we had food distribution companies, rice mills and others that used to buy from the farmers. That isn’t there anymore. This would make the farmers happy and encourage them to farm more. But if they always have to sell and run losses, it is very frustrating for them.
+
+
   
 # 2. Related work
 
@@ -44,9 +44,15 @@ This project thanks the CDD for sharing their data. For this project, I have acc
 
 # 4. Methods
 
-To capture changes in the differences in the words that discussants use through their deliberations, I break each transcript down into 1/10th chunks. I then calculated the similarity of each 1/10th chunk to each other by comparing the word embeddings of each chunk [@spacy2]. For example, of a given transcript, there might be a similarity of .9 between the first and second 1/10th chunks and a similarity of .7 between the third and fourth 1/10th chunks. I use these similarities from each transcript to build two simple OLS models [@scikit-learn]. The first baseline model just uses the similarity of the second and tenth chunks (the first chunk is generally devoted to introductions, welcomes, etc.) to predict opinion deltas. The second model uses all of the similarities to try to predict opinion deltas. I also train a basic neural network in Pytorch [@pytorch] to try to predict the opinion deltas from all of the similarities. 
+To capture changes in the differences in the words that discussants use through their deliberations, I break each transcript down into 1/10th chunks. I then calculated the similarity of each 1/10th chunk to each other by comparing the word embeddings of each chunk. I used similarities from the spacy core model [@spacy2] and BERT [citation. For example, of a given transcript, there might be a similarity of .9 between the first and second 1/10th chunks and a similarity of .7 between the third and fourth 1/10th chunks. I use these similarities from each transcript to build two simple OLS models [@scikit-learn]. The first baseline model just uses the similarity of the second and tenth chunks (the first chunk is generally devoted to introductions, welcomes, etc.) to predict opinion deltas. The second model uses all of the similarities to try to predict opinion deltas. I also train a basic neural network in Pytorch [@pytorch] to try to predict the opinion deltas from all of the similarities. The BERT embeddings performed better than the spacy core model in the regressions, but not in the basic neural network.  
+
+```{r include = T, echo = F, out.width = "50%", fig.align = "center", fig.cap = "Fig. 1: Architecture of basic neural network used on the similarities of word embeddings."}
+knitr::include_graphics("figures/basic_nn.png")
+```
 
 In addition to this approach of using word embeddings, I also built a baseline model using Long Short-Term Memory in Pytorch on the sequences of words in the transcripts. 
+
+Finally, I also used a BERT transformer, but this method performed poorly. 
 
 All code examples that I used as starting points to build these models can be found commented in my code. 
 
@@ -59,13 +65,19 @@ knitr::kable(tibble::tibble(method = c("One word embedding (spacy)", "All word e
        MSE = c(.149, .289, .064, .141, .201, .152, .130, .227)))
 ```
 
-Using the word embedding similarity of the 2nd and 10th 1/10th chunks has a lower loss than using all of the similarities of the embeddings. But both of these perform worse than a basic neural network. The neural network that I used was very simple with only two linear activation functions and one ReLU that took in all 45 of the similarities from the combination of word embeddings. 
+Using the word embedding similarity of the 2nd and 10th 1/10th chunks has a lower loss than using all of the similarities of the embeddings. But both of these perform worse than a basic neural network. 
 
 Despite the varying levels of loss, all of the models seem to be performing poorly upon closer inspection. If you actually examine the predicted values, you see that they are all basically the same. Particularly the basic NN, which has the lowest loss, and the LSTM are simply finding the best average value and applying that "prediction" to all test examples. When I tried to build a more complex neural network, the problem was only exacerbated. To try to circumvent this problem, I am going to try to incorporate data from the Priniski paper. 
 
-# 6. Next Steps
+\newpage
 
-These basic models provide a good baseline estimate of how well one can predict opinion change based on the words that people use in deliberations. My next steps are to incorporate linguistic features. I plan to incorporate the findings of the Priniski and Horne paper that the amount of evidence provided in discussions predicts opinion change. I will also examine the predictive ability of polarity and subjectivity of statements in the transcripts. One limitation of this project is the relatively small number of training examples available. And so, I potentially also leverage transformers to see if they provide the ability to better predict opinion change.
+# 6. Discussion and Next Steps
+
+While the initial goal of training a deep learning model to be able to identify opinion change was largely unsucessful, there are some key learnings that I have from this project.
+
+First, I clearly see now that the words that people are using are not predictive of opinion change. This finding is likely because people talk about the same things, but they talk about them differently. I came into this project theorizing that it is not _what_ people talk about that predicts opinion change, it is _how_ they talk about it. As such, my next steps for this project will be to undertake feature engineering to extract linguistic features, such as polarity, subjectivity, incivility, and citation of data.
+
+And so, my next steps would be using previously coded examples of polarizty/ sentiment, incivility, etc. and transformers to build the features necessary that can be used in a machine or deep learning model to predict opinion change. 
 
 \newpage
 

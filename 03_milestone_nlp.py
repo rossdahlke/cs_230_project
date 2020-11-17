@@ -194,6 +194,13 @@ fit(3000, model, criterion, opt, print_every = 100)
 
 criterion(model(test_inputs.float()), test_targets.float())
 
+# print out model architecture
+
+import torchviz
+
+y = model(test_inputs.float())
+
+torchviz.make_dot(y, params = dict(model.named_parameters()))
 
 ### Also going to use BERT embeddings
 nlp = spacy.load("en_trf_bertbaseuncased_lg")
